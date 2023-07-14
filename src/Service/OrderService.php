@@ -38,47 +38,13 @@ class OrderService implements ServiceInterface
      */
     public function getOrderList($params): array
     {
-        // Get Orders list
-        $limit = $params['limit'] ?? 25;
-        $page = $params['page'] ?? 1;
-        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
-        $offset = ($page - 1) * $limit;
-
-        // Set params
-        $listParams = [
-            'page' => $page,
-            'limit' => $limit,
-            'order' => $order,
-            'offset' => $offset,
-            'status' => 1,
+        $contentParams = [
+            'type' => 'module_order'
         ];
-
-        if (isset($params['user_id']) && !empty($params['user_id'])) {
-            $listParams['user_id'] = $params['user_id'];
+        if (isset($params['user_id'])) {
+            $contentParams['user_id'] = $params['user_id'];
         }
-
-        // Get list
-        $list = [];
-        $rowSet = $this->orderRepository->getOrderList($listParams);
-        foreach ($rowSet as $row) {
-            $list[] = $this->canonizeOrder($row);
-        }
-
-        // Get count
-        $count = $this->orderRepository->getOrderCount($listParams);
-
-        return [
-            'result' => true,
-            'data' => [
-                'list' => $list,
-                'paginator' => [
-                    'count' => $count,
-                    'limit' => $limit,
-                    'page' => $page,
-                ],
-            ],
-            'error' => [],
-        ];
+        return $this->contentItemService->getItemList($contentParams);
     }
 
     /**
@@ -138,8 +104,9 @@ class OrderService implements ServiceInterface
         $content = [
             'user_id' => $params['user_id'],
             'type' => 'module_order',
-            'slug' => 'module_order_' . $order->getId().'_' . $orderParams['slug'],
+            'slug' => 'module_order_' . $order->getId() . '_' . $orderParams['slug'],
             'time_create' => time(),
+            'status' => 1,
             'information' => json_encode([
                 'user_id' => $params['user_id'],
                 'user' => $this->accountService->getAccount(['id' => $params['user_id']]),

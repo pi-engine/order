@@ -44,12 +44,12 @@ class ListHandler implements RequestHandlerInterface
         $params = [
             'user_id' => $account['id'],
             'page'    => $requestBody['page'] ?? 1,
-            'limit'   => $requestBody['limit'] ?? 25,
+            'limit'   => $requestBody['limit'] ?? 100,
         ];
 
         // Get list of Orders
-//        $result = $this->OrderService->getOrderList($params);
+        $result = $this->OrderService->getOrderList($params);
 
-        return new JsonResponse([]);
+        return new JsonResponse($result);
     }
 }
