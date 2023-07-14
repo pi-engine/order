@@ -2,6 +2,7 @@
 
 namespace Order\Factory\Service;
 
+use Content\Service\ItemService;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -23,7 +24,8 @@ class OrderServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): OrderService
     {
         return new OrderService(
-            $container->get(OrderRepositoryInterface::class)
+            $container->get(OrderRepositoryInterface::class),
+            $container->get(ItemService::class)
         );
     }
 }

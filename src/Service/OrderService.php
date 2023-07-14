@@ -2,6 +2,7 @@
 
 namespace Order\Service;
 
+use Content\Service\ItemService;
 use IntlDateFormatter;
 use Order\Repository\OrderRepositoryInterface;
 use User\Service\AccountService;
@@ -10,16 +11,20 @@ use function var_dump;
 class OrderService implements ServiceInterface
 {
     /* @var OrderRepositoryInterface */
-    protected OrderRepositoryInterface $OrderRepository;
+    protected OrderRepositoryInterface $orderRepository;
+
+    protected ItemService $contentItemService;
 
     /**
-     * @param OrderRepositoryInterface $OrderRepository
+     * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
-        OrderRepositoryInterface $OrderRepository
+        OrderRepositoryInterface $orderRepository,
+        ItemService              $contentItemService
     )
     {
-        $this->OrderRepository = $OrderRepository;
+        $this->orderRepository = $orderRepository;
+        $this->contentItemService = $contentItemService;
     }
 
     /**
@@ -50,13 +55,13 @@ class OrderService implements ServiceInterface
 
         // Get list
         $list = [];
-        $rowSet = $this->OrderRepository->getOrderList($listParams);
+        $rowSet = $this->orderRepository->getOrderList($listParams);
         foreach ($rowSet as $row) {
             $list[] = $this->canonizeOrder($row);
         }
 
         // Get count
-        $count = $this->OrderRepository->getOrderCount($listParams);
+        $count = $this->orderRepository->getOrderCount($listParams);
 
         return [
             'result' => true,
@@ -80,7 +85,7 @@ class OrderService implements ServiceInterface
      */
     public function getOrder(string $parameter, string $type = 'id'): array
     {
-        $Order = $this->OrderRepository->getOrder($parameter, $type);
+        $Order = $this->orderRepository->getOrder($parameter, $type);
         return $this->canonizeOrder($Order);
     }
 
@@ -96,7 +101,7 @@ class OrderService implements ServiceInterface
             'viewed' => 1,
         ];
 
-        $this->OrderRepository->updateOrder($updateParams);
+        $this->orderRepository->updateOrder($updateParams);
     }
 
 
