@@ -24,7 +24,14 @@ class OrderRepository implements OrderRepositoryInterface
      *
      * @var string
      */
-    private string $tableOrder = 'Order_Order';
+    private string $tableOrder = 'order_order';
+
+    /**
+     * Order Item Table name
+     *
+     * @var string
+     */
+    private string $tableOrderItem = 'order_item';
 
     /**
      * @var AdapterInterface
@@ -66,10 +73,7 @@ class OrderRepository implements OrderRepositoryInterface
      */
     public function getOrderList(array $params = []): HydratingResultSet|array
     {
-        $where = [];
-        // if (isset($params['user_id']) && !empty($params['user_id'])) {
-        // $where = ['receiver_id IN (' . $params['user_id'] . ') OR  sender_id IN (' . $params['user_id'] . ') '];
-        // }
+
         $where = ['receiver_id IN (' . $params['user_id'] . ') OR  sender_id IN (' . $params['user_id'] . ') OR type="global" '];
         if (isset($params['status']) && !empty($params['status'])) {
             $where['status'] = $params['status'];
@@ -100,81 +104,8 @@ class OrderRepository implements OrderRepositoryInterface
         return $resultSet;
     }
 
-    /**
-     * @param array $params
-     *
-     * @return int
-     */
-    public function getOrderCount(array $params = []): int
-    {
-        // Set where
-        $columns = ['count' => new Expression('count(*)')];
-        $where = [];
 
-//        if (isset($params['user_id']) && !empty($params['user_id'])) {
-//            $where['user_id'] = $params['user_id'];
-//        }
-        $where = ['receiver_id IN (' . $params['user_id'] . ') OR  sender_id IN (' . $params['user_id'] . ') OR type="global" '];
-        if (isset($params['status']) && !empty($params['status'])) {
-            $where['status'] = $params['status'];
-        }
-        if (isset($params['viewed']) && !empty($params['viewed'])) {
-            $where['viewed'] = $params['viewed'];
-        }
-        if (isset($params['sent']) && !empty($params['sent'])) {
-            $where['sent'] = $params['sent'];
-        }
-        if (isset($params['id']) && !empty($params['id'])) {
-            $where['id'] = $params['id'];
-        }
 
-        $sql = new Sql($this->db);
-        $select = $sql->select($this->tableOrder)->columns($columns)->where($where);
-        $statement = $sql->prepareStatementForSqlObject($select);
-        $row = $statement->execute()->current();
-
-        return (int)$row['count'];
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return int
-     */
-    public function getUnreadOrderCount(array $params = []): int
-    {
-        // Set where
-        $columns = ['count' => new Expression('count(*)')];
-
-//        if (isset($params['user_id']) && !empty($params['user_id'])) {
-//            $where['user_id'] = $params['user_id'];
-//        }
-        $where = [];
-        if (isset($params['user_id']) && !empty($params['user_id'])) {
-            $where = ['receiver_id IN (' . $params['user_id'] . ')  '];
-        }
-
-        $where["viewed"] = 0;
-        if (isset($params['status']) && !empty($params['status'])) {
-            $where['status'] = $params['status'];
-        }
-        if (isset($params['viewed']) && !empty($params['viewed'])) {
-            $where['viewed'] = $params['viewed'];
-        }
-        if (isset($params['sent']) && !empty($params['sent'])) {
-            $where['sent'] = $params['sent'];
-        }
-        if (isset($params['id']) && !empty($params['id'])) {
-            $where['id'] = $params['id'];
-        }
-
-        $sql = new Sql($this->db);
-        $select = $sql->select($this->tableOrder)->columns($columns)->where($where);
-        $statement = $sql->prepareStatementForSqlObject($select);
-        $row = $statement->execute()->current();
-
-        return (int)$row['count'];
-    }
 
     /**
      * @param array $params
