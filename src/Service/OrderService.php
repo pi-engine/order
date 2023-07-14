@@ -12,7 +12,6 @@ class OrderService implements ServiceInterface
     /* @var OrderRepositoryInterface */
     protected OrderRepositoryInterface $OrderRepository;
 
-
     /**
      * @param OrderRepositoryInterface $OrderRepository
      */
@@ -87,30 +86,6 @@ class OrderService implements ServiceInterface
 
     /**
      * @param $params
-     *
-     * @return int
-     */
-    public function getNotViewedCount($params): array
-    {
-        // Set params
-        $listParams = [
-            'user_id' => $params['user_id'],
-            'viewed' => 0,
-            'status' => 1,
-        ];
-
-        return [
-            'result' => true,
-            'data' => [
-                'count' => $this->OrderRepository->getOrderCount($listParams),
-                'unread' => $this->OrderRepository->getUnreadOrderCount($listParams),
-            ],
-            'error' => [],
-        ];
-    }
-
-    /**
-     * @param $params
      */
     public function updateView($params): void
     {
@@ -122,6 +97,12 @@ class OrderService implements ServiceInterface
         ];
 
         $this->OrderRepository->updateOrder($updateParams);
+    }
+
+
+    public function createOrder(array $params): array
+    {
+        return $params;
     }
 
     /**
@@ -170,85 +151,4 @@ class OrderService implements ServiceInterface
         return array_merge($Order, $information);
     }
 
-    /**
-     * @param $params
-     */
-    public function send($params, $side = 'customer'): void
-    {
-        // Send Order as mail
-        if (isset($params['email']) && !empty($params['email'])) {
-            $this->mailInterface->send($this->config['email'], $params['email']);
-        }
-
-        // Send Order as SMS
-        if (isset($params['sms']) && !empty($params['sms'])) {
-            $this->smsInterface->send($this->config['sms'], $params['sms']);
-        }
-
-        // Send Order and push
-        if (isset($params['push']) && !empty($params['push'])) {
-            $this->pushInterface->send($this->config['push'][$side], $params['push']);
-        }
-
-//        var_dump($params);
-        // Save to DB
-
-        if (isset($params['information']) && !empty($params['information'])) {
-            // Set params
-            $addParams = [
-                'sender_id' => $params['information']['sender_id'],
-                'receiver_id' => $params['information']['receiver_id'],
-                'type' => $params['information']['type'],
-                'viewed' => 0,
-                'sent' => 1,
-                'time_create' => time(),
-                'time_update' => time(),
-                'information' => json_encode($params['information']),
-            ];
-            if (isset($params['information']['viewed'])) {
-                $addParams['viewed'] = $params['information']['viewed'];
-            }
-            // Add Order to DB
-            $this->OrderRepository->addOrder($addParams);
-        }
-    }
-
-    /**
-     * @param $params
-     */
-    public function middleSend($params): array
-    {
-        $OrderParams = [
-            'information' =>
-                [
-                    "device_token" => '/topics/global',
-                    "in_app" => false,
-                    "in_app_title" => $params['title'],
-                    "title" => $params['title'],
-                    "in_app_body" => $params['message'],
-                    "body" => $params['message'],
-                    "event" => 'global',
-                    "user_id" => (int)$params['user_id'],
-                    "item_id" => 0,
-                    "viewed" => 1,
-                    "sender_id" => $params['user_id'],
-                    "type" => 'global',
-                    "image_url" => '',
-                    "receiver_id" => 0
-                ],
-        ];
-        $OrderParams['push'] = $OrderParams['information'];
-        $this->send($OrderParams, 'customer');
-        return [
-            "result" => true,
-        ];
-    }
-
-    /**
-     * @param $params
-     */
-    public function middleUpdate($params): void
-    {
-        $this->OrderRepository->updateOrder($params);
-    }
 }

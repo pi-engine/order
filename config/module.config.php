@@ -52,7 +52,8 @@ return [
                                         'handler' => 'create',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
-                                            SecurityMiddleware::class,
+                                            ///TODO:resolve it when user send json for information
+//                                            SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Api\Reserve\CreateHandler::class
