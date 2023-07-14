@@ -59,26 +59,11 @@ class OrderService implements ServiceInterface
         return $this->canonizeOrder($Order);
     }
 
-    /**
-     * @param $params
-     */
-    public function updateView($params): void
-    {
-        // Set params
-        $updateParams = [
-            'id' => $params['id'],
-            'user_id' => $params['user_id'],
-            'viewed' => 1,
-        ];
-
-        $this->orderRepository->updateOrder($updateParams);
-    }
-
 
     /// use for reserve
     public function createReserveOrder(array $params, $account): array
     {
-        $ordered = $this->contentItemService->getItem($params['item_id']);
+        $ordered = $this->contentItemService->getItem($params['item_id'],'id', ['type' => 'tour']);
         $orderParams = [
             'user_id' => $params['user_id'],
             'slug' => $this->orderSlugGenerator($params['user_id'], $params['type'], time()),
