@@ -9,12 +9,12 @@ class Order
     private int $user_id;
     private string $type;
     private string $status;
-    private int $subtotal;
-    private int $tax;
-    private int $discount;
-    private int $gift;
-    private int $total_amount;
-    private array $information;
+    private ?int $subtotal;
+    private ?int $tax;
+    private ?int $discount;
+    private ?int $gift;
+    private ?int $total_amount;
+    private ?string $information;
     private int $time_create;
     private int $time_update;
     private int $time_delete;
@@ -25,12 +25,12 @@ class Order
         int $user_id,
         string $type = 'order',
         string $status = 'waiting',
-        int $subtotal ,
-        int $tax ,
-        int $discount ,
-        int $gift ,
-        int $total_amount ,
-        array $information ,
+        ?int $subtotal = null,
+        ?int $tax = null,
+        ?int $discount = null,
+        ?int $gift = null,
+        ?int $total_amount = null,
+        ?string $information ,
         int $time_create = 0,
         int $time_update = 0,
         int $time_delete = 0

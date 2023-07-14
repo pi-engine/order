@@ -45,14 +45,15 @@ class CreateHandler implements RequestHandlerInterface
         $params = [
             'user_id' => $account['id'],
             'type' => 'reserve_tour',
+            'ordered_type' => 'tour',
             'persons_count' => (int)$requestBody['count'],
             'persons' => json_decode($requestBody['information'], true),
-            'tour_id' => $requestBody['tour_id'],
-            'tour_slug' => $requestBody['tour_slug'],
+            'item_id' => $requestBody['item_id'],
+            'item_slug' => $requestBody['item_slug'],
         ];
 
         // Get list of Orders
-        $result = $this->OrderService->createOrder($params);
+        $result = $this->OrderService->createReserveOrder($params, $account);
 
         return new JsonResponse($result);
     }

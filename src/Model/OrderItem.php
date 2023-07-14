@@ -7,6 +7,9 @@ class OrderItem
     private int $id;
     private int $user_id;
     private int $order_id;
+    private ?string $ordered_slug;
+    private ?string $ordered_type;
+
     private ?int $ordered_id;
     private ?int $quantity;
     private ?int $unit_price;
@@ -15,7 +18,7 @@ class OrderItem
     private ?int $gift;
     private ?int $price;
     private int $status;
-    private ?array $information;
+    private ?string $information;
     private int $time_create;
     private int $time_update;
     private int $time_delete;
@@ -24,6 +27,8 @@ class OrderItem
         int $id,
         int $user_id,
         int $order_id,
+        ?string $ordered_slug = null,
+        ?string $ordered_type = null,
         ?int $ordered_id = null,
         ?int $quantity = null,
         ?int $unit_price = null,
@@ -32,7 +37,7 @@ class OrderItem
         ?int $gift = null,
         ?int $price = null,
         int $status = 1,
-        ?array $information = null,
+        ?string $information = null,
         int $time_create = 0,
         int $time_update = 0,
         int $time_delete = 0
@@ -40,6 +45,8 @@ class OrderItem
         $this->id = $id;
         $this->user_id = $user_id;
         $this->order_id = $order_id;
+        $this->ordered_slug = $ordered_slug;
+        $this->ordered_type = $ordered_type;
         $this->ordered_id = $ordered_id;
         $this->quantity = $quantity;
         $this->unit_price = $unit_price;
@@ -82,6 +89,26 @@ class OrderItem
     public function setOrderedId(?int $ordered_id): void
     {
         $this->ordered_id = $ordered_id;
+    }
+
+    public function getOrderedSlug(): ?string
+    {
+        return $this->ordered_slug;
+    }
+
+    public function setOrderedSlug(?string $ordered_slug): void
+    {
+        $this->ordered_slug = $ordered_slug;
+    }
+
+    public function getOrderedType(): ?string
+    {
+        return $this->ordered_type;
+    }
+
+    public function setOrderedType(?string $ordered_type): void
+    {
+        $this->ordered_type = $ordered_type;
     }
 
     public function getQuantity(): ?int

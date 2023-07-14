@@ -28,14 +28,19 @@ class OrderRepositoryFactory implements FactoryInterface
         return new OrderRepository(
             $container->get(AdapterInterface::class),
             new ReflectionHydrator(),
-            new Order(0, '', 0, '', '', 0, 0, 0, 0, 0, [], 0, 0, 0),
+            new Order(
+                0,
+                '',
+                0, '', '', 0, 0, 0, 0, 0,'', 0, 0, 0),
             new OrderItem(
                 0,
                 0,
                 0,
                 0,
                 0,
-                0, 0, 0, 0, 0, 0, [], 0, 0, 0),
+                0,
+                0,
+                0, 0, 0, 0, 0, 0, '', 0, 0, 0),
         );
     }
 }

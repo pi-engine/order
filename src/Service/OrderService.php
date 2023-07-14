@@ -15,16 +15,20 @@ class OrderService implements ServiceInterface
 
     protected ItemService $contentItemService;
 
+    protected AccountService $accountService;
+
     /**
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        ItemService              $contentItemService
+        ItemService              $contentItemService,
+        AccountService           $accountService
     )
     {
         $this->orderRepository = $orderRepository;
         $this->contentItemService = $contentItemService;
+        $this->accountService = $accountService;
     }
 
     /**
@@ -105,10 +109,57 @@ class OrderService implements ServiceInterface
     }
 
 
-    public function createOrder(array $params): array
+    /// use for reserve
+    public function createReserveOrder(array $params, $account): array
     {
-        $order = $this->orderRepository->addOrder($params);
-        return $params;
+        $ordered = $this->contentItemService->getItem($params['item_id']);
+        $orderParams = [
+            'user_id' => $params['user_id'],
+            'slug' => $this->orderSlugGenerator($params['user_id'], $params['type'], time()),
+            'type' => $params['type'],
+            'information' => json_encode(['order_history' => ['time_create' => time()]]),
+            'time_create' => time()
+        ];
+        $order = $this->orderRepository->addOrder($orderParams);
+
+        $orderItemParams = [
+            'user_id' => $params['user_id'],
+            'order_id' => $order->getId(),
+            'ordered_id' => $params['item_id'],
+            'ordered_slug' => $params['item_slug'],
+            'ordered_type' => $params['ordered_type'],
+            'quantity' => $params['persons_count'],
+            'information' => json_encode($params['persons']),
+            'time_create' => time()
+        ];
+
+        $orderItem = $this->orderRepository->addOrderItem($orderItemParams);
+
+        $content = [
+            'user_id' => $params['user_id'],
+            'type' => 'module_order',
+            'slug' => 'module_order_' . $order->getId().'_' . $orderParams['slug'],
+            'time_create' => time(),
+            'information' => json_encode([
+                'user_id' => $params['user_id'],
+                'user' => $this->accountService->getAccount(['id' => $params['user_id']]),
+                'user_profile' => $this->accountService->getProfile(['user_id' => $params['user_id']]),
+                'type' => 'module_order',
+                'slug' => 'module_order_' . $orderParams['slug'],
+                'time_create' => time(),
+                'order_id' => $order->getId(),
+                'ordered_id' => $params['item_id'],
+                'ordered_slug' => $params['item_slug'],
+                'ordered_type' => $params['ordered_type'],
+                'order_type' => $params['type'],
+                'quantity' => $params['persons_count'],
+                'ordered' => $ordered,
+                'persons' => $params['persons']
+            ])
+        ];
+        $this->contentItemService->addItem($content, $account);
+        ///TODO:store this order to content module
+        return [$orderItem->getId()];
     }
 
     /**
@@ -156,5 +207,11 @@ class OrderService implements ServiceInterface
 
         return array_merge($Order, $information);
     }
+
+    private function orderSlugGenerator(int $user_id, string $type, int $timestamp): string
+    {
+        return sprintf('user_%d_%s_%s', $user_id, strtolower(str_replace(' ', '_', $type)), date('Ymd', $timestamp));
+    }
+
 
 }

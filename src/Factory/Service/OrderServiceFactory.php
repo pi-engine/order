@@ -9,6 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Order\Repository\OrderRepositoryInterface;
 use Order\Service\OrderService;
+use User\Service\AccountService;
 
 class OrderServiceFactory implements FactoryInterface
 {
@@ -25,7 +26,8 @@ class OrderServiceFactory implements FactoryInterface
     {
         return new OrderService(
             $container->get(OrderRepositoryInterface::class),
-            $container->get(ItemService::class)
+            $container->get(ItemService::class),
+            $container->get(AccountService::class)
         );
     }
 }

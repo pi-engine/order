@@ -56,8 +56,8 @@ class OrderRepository implements OrderRepositoryInterface
     public function __construct(
         AdapterInterface  $db,
         HydratorInterface $hydrator,
-        Order           $orderPrototype,
-        OrderItem           $orderItemPrototype
+        Order             $orderPrototype,
+        OrderItem         $orderItemPrototype
     )
     {
         $this->db = $db;
@@ -105,8 +105,6 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
 
-
-
     /**
      * @param array $params
      *
@@ -127,7 +125,7 @@ class OrderRepository implements OrderRepositoryInterface
             );
         }
         $id = $result->getGeneratedValue();
-        return $this->getOrder($id);
+        return $this->getOrder(['id' => $id]);
     }
 
     /**
@@ -136,9 +134,9 @@ class OrderRepository implements OrderRepositoryInterface
      *
      * @return object|array
      */
-    public function getOrder($parameter, $type = 'id'): object|array
+    public function getOrder($params): object|array
     {
-        $where = [$type => $parameter];
+        $where = $params;
 
         $sql = new Sql($this->db);
         $select = $sql->select($this->tableOrder)->where($where);
@@ -149,7 +147,7 @@ class OrderRepository implements OrderRepositoryInterface
             throw new RuntimeException(
                 sprintf(
                     'Failed retrieving blog post with identifier "%s"; unknown database error.',
-                    $parameter
+                    ''
                 )
             );
         }
@@ -202,5 +200,63 @@ class OrderRepository implements OrderRepositoryInterface
         $sql = new Sql($this->db);
         $statement = $sql->prepareStatementForSqlObject($delete);
         $statement->execute();
+    }
+
+    /**
+     * @param string $parameter
+     * @param string $type
+     *
+     * @return object|array
+     */
+    public function getOrderItem($params): object|array
+    {
+        $where = $params;
+
+        $sql = new Sql($this->db);
+        $select = $sql->select($this->tableOrderItem)->where($where);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface || !$result->isQueryResult()) {
+            throw new RuntimeException(
+                sprintf(
+                    'Failed retrieving blog post with identifier "%s"; unknown database error.',
+                    ''
+                )
+            );
+        }
+
+        $resultSet = new HydratingResultSet($this->hydrator, $this->orderPrototype);
+        $resultSet->initialize($result);
+        $item = $resultSet->current();
+
+        if (!$item) {
+            return [];
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array|object
+     */
+    public function addOrderItem(array $params): object|array
+    {
+        $insert = new Insert($this->tableOrderItem);
+        $insert->values($params);
+
+        $sql = new Sql($this->db);
+        $statement = $sql->prepareStatementForSqlObject($insert);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface) {
+            throw new RuntimeException(
+                'Database error occurred during blog post insert operation'
+            );
+        }
+        $id = $result->getGeneratedValue();
+        return $this->getOrderItem(['id' => $id]);
     }
 }
