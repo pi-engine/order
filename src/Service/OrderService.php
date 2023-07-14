@@ -107,6 +107,7 @@ class OrderService implements ServiceInterface
 
     public function createOrder(array $params): array
     {
+        $order = $this->orderRepository->addOrder($params);
         return $params;
     }
 
