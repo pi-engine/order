@@ -162,7 +162,7 @@ class OrderService implements ServiceInterface
 
     private function orderSlugGenerator(int $user_id, string $type, int $timestamp): string
     {
-        return sprintf('user_%d_%s_%s', $user_id, strtolower(str_replace(' ', '_', $type)), date('Ymd', $timestamp));
+        return sprintf('user_%d_%s_%d', $user_id, strtolower(str_replace(' ', '_', $type)),   $timestamp );
     }
 
 
