@@ -1,6 +1,6 @@
 <?php
 
-namespace Order\Handler\Api\Reserve;
+namespace Order\Handler\Api\Physical;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;

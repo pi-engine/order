@@ -1,6 +1,6 @@
 <?php
 
-namespace Order\Handler\Api\Reserve;
+namespace Order\Handler\Api\Physical;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -10,7 +10,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Order\Service\OrderService;
 
-class ListHandler implements RequestHandlerInterface
+class CreateHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -24,11 +24,12 @@ class ListHandler implements RequestHandlerInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        OrderService $orderService
-    ) {
-        $this->responseFactory     = $responseFactory;
-        $this->streamFactory       = $streamFactory;
+        StreamFactoryInterface   $streamFactory,
+        OrderService             $orderService
+    )
+    {
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
         $this->orderService = $orderService;
     }
 
@@ -40,15 +41,17 @@ class ListHandler implements RequestHandlerInterface
         // Get request body
         $requestBody = $request->getParsedBody();
 
-        // Set record params
-        $params = [
-            'user_id' => $account['id'],
-            'page'    => $requestBody['page'] ?? 1,
-            'limit'   => $requestBody['limit'] ?? 100,
-        ];
+        $requestBody["user_id"] =  $account['id'];
 
-        // Get list of Orders
-        $result = $this->orderService->getOrderList($params);
+        // Get list of notifications
+        $result = $this->orderService->createPhysicalOrder($requestBody,$account);
+
+        // Set result
+        $result = [
+            'result' => true,
+            'data'   => $result,
+            'error'  => [],
+        ];
 
         return new JsonResponse($result);
     }

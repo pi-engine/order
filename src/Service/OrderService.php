@@ -63,7 +63,7 @@ class OrderService implements ServiceInterface
     /// use for reserve
     public function createReserveOrder(array $params, $account): array
     {
-        $ordered = $this->contentItemService->getItem($params['item_id'],'id', ['type' => 'tour']);
+        $ordered = $this->contentItemService->getItem($params['item_id'], 'id', ['type' => 'tour']);
         $orderParams = [
             'user_id' => $params['user_id'],
             'slug' => $this->orderSlugGenerator($params['user_id'], $params['type'], time()),
@@ -162,7 +162,12 @@ class OrderService implements ServiceInterface
 
     private function orderSlugGenerator(int $user_id, string $type, int $timestamp): string
     {
-        return sprintf('user_%d_%s_%d', $user_id, strtolower(str_replace(' ', '_', $type)),   $timestamp );
+        return sprintf('user_%d_%s_%d', $user_id, strtolower(str_replace(' ', '_', $type)), $timestamp);
+    }
+
+    public function createPhysicalOrder(object|array $params, mixed $account): array
+    {
+        return $this->contentItemService->addOrderItem($params, $account);
     }
 
 

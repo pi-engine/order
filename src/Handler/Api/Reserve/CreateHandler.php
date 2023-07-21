@@ -19,18 +19,18 @@ class CreateHandler implements RequestHandlerInterface
     protected StreamFactoryInterface $streamFactory;
 
     /** @var OrderService */
-    protected OrderService $OrderService;
+    protected OrderService $orderService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        OrderService             $OrderService
+        OrderService             $orderService
     )
     {
         $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory;
-        $this->OrderService = $OrderService;
+        $this->orderService = $orderService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -44,7 +44,8 @@ class CreateHandler implements RequestHandlerInterface
         // Set record params
         $params = [
             'user_id' => $account['id'],
-            'type' => 'reserve_tour',
+            'order_type' => 'reserve',
+            'entity_type' => 'tour',
             'ordered_type' => 'tour',
             'persons_count' => (int)$requestBody['count'],
             'persons' => json_decode($requestBody['information'], true),
@@ -53,7 +54,7 @@ class CreateHandler implements RequestHandlerInterface
         ];
 
         // Get list of Orders
-        $result = $this->OrderService->createReserveOrder($params, $account);
+        $result = $this->orderService->createReserveOrder($params, $account);
 
         return new JsonResponse($result);
     }

@@ -7,7 +7,8 @@ class Order
     private int $id;
     private string $slug;
     private int $user_id;
-    private string $type;
+    private string $order_type;
+    private string $entity_type;
     private string $status;
     private ?int $subtotal;
     private ?int $tax;
@@ -15,30 +16,53 @@ class Order
     private ?int $gift;
     private ?int $total_amount;
     private ?string $information;
+    private ?string $payment_method;
     private int $time_create;
     private int $time_update;
     private int $time_delete;
 
+    /**
+     * @param int $id
+     * @param string $slug
+     * @param int $user_id
+     * @param string $order_type
+     * @param string $entity_type
+     * @param string $status
+     * @param int|null $subtotal
+     * @param int|null $tax
+     * @param int|null $discount
+     * @param int|null $gift
+     * @param int|null $total_amount
+     * @param string|null $information
+     * @param string|null $payment_method
+     * @param int $time_create
+     * @param int $time_update
+     * @param int $time_delete
+     */
     public function __construct(
-        int $id,
-        string $slug,
-        int $user_id,
-        string $type = 'order',
-        string $status = 'waiting',
-        ?int $subtotal = null,
-        ?int $tax = null,
-        ?int $discount = null,
-        ?int $gift = null,
-        ?int $total_amount = null,
-        ?string $information ,
-        int $time_create = 0,
-        int $time_update = 0,
-        int $time_delete = 0
-    ) {
+        int     $id,
+        string  $slug,
+        int     $user_id,
+        string  $order_type,
+        string  $entity_type,
+        string  $status,
+        ?int    $subtotal,
+        ?int    $tax,
+        ?int    $discount,
+        ?int    $gift,
+        ?int    $total_amount,
+        ?string $information,
+        ?string $payment_method,
+        int     $time_create,
+        int     $time_update,
+        int     $time_delete
+    )
+    {
         $this->id = $id;
         $this->slug = $slug;
         $this->user_id = $user_id;
-        $this->type = $type;
+        $this->order_type = $order_type;
+        $this->entity_type = $entity_type;
         $this->status = $status;
         $this->subtotal = $subtotal;
         $this->tax = $tax;
@@ -46,148 +70,266 @@ class Order
         $this->gift = $gift;
         $this->total_amount = $total_amount;
         $this->information = $information;
+        $this->payment_method = $payment_method;
         $this->time_create = $time_create;
         $this->time_update = $time_update;
         $this->time_delete = $time_delete;
     }
 
+    /**
+     * @return int
+     */
     public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * @param int $id
+     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
+    /**
+     * @return string
+     */
     public function getSlug(): string
     {
         return $this->slug;
     }
 
+    /**
+     * @param string $slug
+     */
     public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
 
+    /**
+     * @return int
+     */
     public function getUserId(): int
     {
         return $this->user_id;
     }
 
+    /**
+     * @param int $user_id
+     */
     public function setUserId(int $user_id): void
     {
         $this->user_id = $user_id;
     }
 
-    public function getType(): string
+    /**
+     * @return string
+     */
+    public function getOrderType(): string
     {
-        return $this->type;
+        return $this->order_type;
     }
 
-    public function setType(string $type): void
+    /**
+     * @param string $order_type
+     */
+    public function setOrderType(string $order_type): void
     {
-        $this->type = $type;
+        $this->order_type = $order_type;
     }
 
+    /**
+     * @return string
+     */
+    public function getEntityType(): string
+    {
+        return $this->entity_type;
+    }
+
+    /**
+     * @param string $entity_type
+     */
+    public function setEntityType(string $entity_type): void
+    {
+        $this->entity_type = $entity_type;
+    }
+
+    /**
+     * @return string
+     */
     public function getStatus(): string
     {
         return $this->status;
     }
 
+    /**
+     * @param string $status
+     */
     public function setStatus(string $status): void
     {
         $this->status = $status;
     }
 
-    public function getSubtotal(): int
+    /**
+     * @return int|null
+     */
+    public function getSubtotal(): ?int
     {
         return $this->subtotal;
     }
 
-    public function setSubtotal(int $subtotal): void
+    /**
+     * @param int|null $subtotal
+     */
+    public function setSubtotal(?int $subtotal): void
     {
         $this->subtotal = $subtotal;
     }
 
-    public function getTax(): int
+    /**
+     * @return int|null
+     */
+    public function getTax(): ?int
     {
         return $this->tax;
     }
 
-    public function setTax(int $tax): void
+    /**
+     * @param int|null $tax
+     */
+    public function setTax(?int $tax): void
     {
         $this->tax = $tax;
     }
 
-    public function getDiscount(): int
+    /**
+     * @return int|null
+     */
+    public function getDiscount(): ?int
     {
         return $this->discount;
     }
 
-    public function setDiscount(int $discount): void
+    /**
+     * @param int|null $discount
+     */
+    public function setDiscount(?int $discount): void
     {
         $this->discount = $discount;
     }
 
-    public function getGift(): int
+    /**
+     * @return int|null
+     */
+    public function getGift(): ?int
     {
         return $this->gift;
     }
 
-    public function setGift(int $gift): void
+    /**
+     * @param int|null $gift
+     */
+    public function setGift(?int $gift): void
     {
         $this->gift = $gift;
     }
 
-    public function getTotalAmount(): int
+    /**
+     * @return int|null
+     */
+    public function getTotalAmount(): ?int
     {
         return $this->total_amount;
     }
 
-    public function setTotalAmount(int $total_amount): void
+    /**
+     * @param int|null $total_amount
+     */
+    public function setTotalAmount(?int $total_amount): void
     {
         $this->total_amount = $total_amount;
     }
 
-    public function getInformation(): array
+    /**
+     * @return string|null
+     */
+    public function getInformation(): ?string
     {
         return $this->information;
     }
 
-    public function setInformation(array $information): void
+    /**
+     * @param string|null $information
+     */
+    public function setInformation(?string $information): void
     {
         $this->information = $information;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getPaymentMethod(): ?string
+    {
+        return $this->payment_method;
+    }
+
+    /**
+     * @param string|null $payment_method
+     */
+    public function setPaymentMethod(?string $payment_method): void
+    {
+        $this->payment_method = $payment_method;
+    }
+
+    /**
+     * @return int
+     */
     public function getTimeCreate(): int
     {
         return $this->time_create;
     }
 
+    /**
+     * @param int $time_create
+     */
     public function setTimeCreate(int $time_create): void
     {
         $this->time_create = $time_create;
     }
 
+    /**
+     * @return int
+     */
     public function getTimeUpdate(): int
     {
         return $this->time_update;
     }
 
+    /**
+     * @param int $time_update
+     */
     public function setTimeUpdate(int $time_update): void
     {
         $this->time_update = $time_update;
     }
 
+    /**
+     * @return int
+     */
     public function getTimeDelete(): int
     {
         return $this->time_delete;
     }
 
+    /**
+     * @param int $time_delete
+     */
     public function setTimeDelete(int $time_delete): void
     {
         $this->time_delete = $time_delete;
     }
+
 }

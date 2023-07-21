@@ -30,8 +30,22 @@ class OrderRepositoryFactory implements FactoryInterface
             new ReflectionHydrator(),
             new Order(
                 0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
                 '',
-                0, '', '', 0, 0, 0, 0, 0,'', 0, 0, 0),
+                0,
+                0,
+                0,
+                0
+            ),
             new OrderItem(
                 0,
                 0,
@@ -40,7 +54,17 @@ class OrderRepositoryFactory implements FactoryInterface
                 0,
                 0,
                 0,
-                0, 0, 0, 0, 0, 0, '', 0, 0, 0),
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                '',
+                0,
+                0,
+                0
+            ),
         );
     }
 }

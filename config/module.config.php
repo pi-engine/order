@@ -22,6 +22,9 @@ return [
             Handler\Api\Reserve\CreateHandler::class => Factory\Handler\Api\Reserve\CreateHandlerFactory::class,
             Handler\Api\Reserve\ListHandler::class => Factory\Handler\Api\Reserve\ListHandlerFactory::class,
 
+            Handler\Api\Physical\CreateHandler::class => Factory\Handler\Api\Physical\CreateHandlerFactory::class,
+            Handler\Api\Physical\ListHandler::class => Factory\Handler\Api\Physical\ListHandlerFactory::class,
+
         ],
     ],
     'router' => [
@@ -75,6 +78,54 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             Handler\Api\Reserve\ListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'physical' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/physical',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'create' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/create',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'physical',
+                                        'handler' => 'create',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            ///TODO:resolve it when user send json for information
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Physical\CreateHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'list' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/list',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'physical',
+                                        'handler' => 'list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Physical\CreateHandler::class
                                         ),
                                     ],
                                 ],

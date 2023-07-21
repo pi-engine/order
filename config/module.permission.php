@@ -24,5 +24,27 @@ return [
                 'admin',
             ],
         ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'physical',
+            'handler'     => 'create',
+            'permission' => 'api-order-physical-list',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'physical',
+            'handler'     => 'list',
+            'permission' => 'api-order-physical-list',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
     ],
 ];
