@@ -47,6 +47,7 @@ class ListHandler implements RequestHandlerInterface
             'limit'   => $requestBody['limit'] ?? 100,
         ];
 
+        return[];
         // Get list of Orders
         $result = $this->orderService->getOrderList($params);
 

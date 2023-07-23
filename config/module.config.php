@@ -125,7 +125,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Api\Physical\CreateHandler::class
+                                            Handler\Api\Physical\ListHandler::class
                                         ),
                                     ],
                                 ],

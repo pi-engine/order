@@ -44,7 +44,7 @@ class OrderService implements ServiceInterface
         if (isset($params['user_id'])) {
             $contentParams['user_id'] = $params['user_id'];
         }
-        return $this->contentItemService->getItemList($contentParams);
+        return $this->orderRepository->getOrderList($contentParams);
     }
 
     /**
