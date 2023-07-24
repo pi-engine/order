@@ -18,6 +18,7 @@ return [
 
             Repository\OrderRepository::class => Factory\Repository\OrderRepositoryFactory::class,
             Service\OrderService::class => Factory\Service\OrderServiceFactory::class,
+            Service\PaymentService::class => Factory\Service\PaymentServiceFactory::class,
 
             Handler\Api\Reserve\CreateHandler::class => Factory\Handler\Api\Reserve\CreateHandlerFactory::class,
             Handler\Api\Reserve\ListHandler::class => Factory\Handler\Api\Reserve\ListHandlerFactory::class,
@@ -26,6 +27,11 @@ return [
             Handler\Api\Physical\ListHandler::class => Factory\Handler\Api\Physical\ListHandlerFactory::class,
             Handler\Api\Physical\GetHandler::class => Factory\Handler\Api\Physical\GetHandlerFactory::class,
             Handler\Api\Physical\UpdateHandler::class => Factory\Handler\Api\Physical\UpdateHandlerFactory::class,
+
+            Handler\Api\Payment\GetHandler::class => Factory\Handler\Api\Payment\GetHandlerFactory::class,
+            Handler\Api\Payment\ListHandler::class => Factory\Handler\Api\Payment\ListHandlerFactory::class,
+            Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
+
 
         ],
     ],
@@ -166,6 +172,72 @@ return [
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Api\Physical\UpdateHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'payment' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/payment',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'list' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/list',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'payment',
+                                        'handler' => 'list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Payment\ListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'get' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/get',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'payment',
+                                        'handler' => 'get',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Payment\GetHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'verify' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/verify',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'payment',
+                                        'handler' => 'update',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Payment\VerifyHandler::class
                                         ),
                                     ],
                                 ],

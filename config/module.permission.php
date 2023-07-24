@@ -68,5 +68,39 @@ return [
                 'admin',
             ],
         ],
+
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'payment',
+            'handler'     => 'list',
+            'permission' => 'api-order-payment-list',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'payment',
+            'handler'     => 'get',
+            'permission' => 'api-order-payment-get',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'payment',
+            'handler'     => 'verify',
+            'permission' => 'api-order-payment-verify',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
     ],
 ];
