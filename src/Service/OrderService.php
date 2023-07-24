@@ -6,6 +6,7 @@ use Content\Service\ItemService;
 use IntlDateFormatter;
 use Order\Repository\OrderRepositoryInterface;
 use User\Service\AccountService;
+use User\Service\UtilityService;
 use function var_dump;
 
 class OrderService implements ServiceInterface
@@ -16,6 +17,7 @@ class OrderService implements ServiceInterface
     protected ItemService $contentItemService;
 
     protected AccountService $accountService;
+    protected UtilityService $utilityService;
 
     /**
      * @param OrderRepositoryInterface $orderRepository
@@ -23,12 +25,14 @@ class OrderService implements ServiceInterface
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         ItemService              $contentItemService,
-        AccountService           $accountService
+        AccountService           $accountService,
+        UtilityService           $utilityService
     )
     {
         $this->orderRepository = $orderRepository;
         $this->contentItemService = $contentItemService;
         $this->accountService = $accountService;
+        $this->utilityService = $utilityService;
     }
 
     /**
@@ -36,15 +40,39 @@ class OrderService implements ServiceInterface
      *
      * @return array
      */
-    public function getOrderList($params): array
+    public function getOrderList($params, $account): array|null
     {
+        $limit = $params['limit'] ?? 25;
+        $page = $params['page'] ?? 1;
+        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
+        $offset = ($page - 1) * $limit;
         $contentParams = [
-            'type' => 'module_order'
+            "order" => $order,
+            "offset" => $offset,
+            "limit" => $limit,
         ];
         if (isset($params['user_id'])) {
-            $contentParams['user_id'] = $params['user_id'];
+            $contentParams['user_id'] = (int)$params['user_id'];
         }
-        return $this->orderRepository->getOrderList($contentParams);
+
+        $rowSet = $this->orderRepository->getOrderList($contentParams);
+        $list = [];
+        foreach ($rowSet as $row) {
+            $list[] = $this->canonizeOrder($row);
+        }
+        return [
+            'result' => true,
+            'data' => [
+                'list' => $list,
+                'paginator' => [
+                    'count' => 0,
+                    'limit' => $limit,
+                    'page' => $page,
+                ],
+                'filters' => [],
+            ],
+            'error' => [],
+        ];
     }
 
     /**
@@ -53,9 +81,9 @@ class OrderService implements ServiceInterface
      *
      * @return array
      */
-    public function getOrder(string $parameter, string $type = 'id'): array
+    public function getOrder($params,$account): array
     {
-        $order = $this->orderRepository->getOrder($parameter, $type);
+        $order = $this->orderRepository->getOrder($params);
         return $this->canonizeOrder($order);
     }
 
@@ -174,6 +202,7 @@ class OrderService implements ServiceInterface
         if (is_object($order)) {
             $order = [
                 'id' => (int)$order->getId(),
+                'slug' => $order->getSlug(),
                 'user_id' => $order->getUserId(),
                 'user' => $this->accountService->getProfile(['user_id' => $order->getUserId()]),
                 'entity_type' => $order->getEntityType(),
@@ -184,13 +213,14 @@ class OrderService implements ServiceInterface
                 'discount' => $order->getDiscount(),
                 'gift' => $order->getGift(),
                 'payment_method' => $order->getPaymentMethod(),
-                'create_time' => $order->getTimeCreate(),
+                'time_create' => $order->getTimeCreate(),
                 'total_amount' => $order->getTotalAmount(),
                 'information' => (!empty($order->getInformation())) ? json_decode($order->getInformation(), true) : [],
             ];
         } else {
             $order = [
                 'id' => (int)$order['id'],
+                'slug' => $order['slug'],
                 'user_id' => (int)$order['user_id'],
                 'user' => $this->accountService->getProfile(['user_id' => $order['user']]),
                 'entity_type' => $order['entity_type'],
@@ -207,7 +237,9 @@ class OrderService implements ServiceInterface
             ];
         }
 
-
+        $order["time_create_view"] = $this->utilityService->date($order['time_create']);
+//        $order["total_amount_view"] = $this->utilityService->setCurrency($order['total_amount']);
+        $order["total_amount_view"] = $order['total_amount'] . ' تومان';
         return ($order);
     }
 

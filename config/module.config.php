@@ -24,6 +24,8 @@ return [
 
             Handler\Api\Physical\CreateHandler::class => Factory\Handler\Api\Physical\CreateHandlerFactory::class,
             Handler\Api\Physical\ListHandler::class => Factory\Handler\Api\Physical\ListHandlerFactory::class,
+            Handler\Api\Physical\GetHandler::class => Factory\Handler\Api\Physical\GetHandlerFactory::class,
+            Handler\Api\Physical\UpdateHandler::class => Factory\Handler\Api\Physical\UpdateHandlerFactory::class,
 
         ],
     ],
@@ -126,6 +128,44 @@ return [
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Api\Physical\ListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'get' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/get',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'physical',
+                                        'handler' => 'get',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Physical\GetHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'update' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/update',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'physical',
+                                        'handler' => 'update',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Physical\UpdateHandler::class
                                         ),
                                     ],
                                 ],

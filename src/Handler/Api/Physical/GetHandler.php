@@ -10,7 +10,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Order\Service\OrderService;
 
-class ListHandler implements RequestHandlerInterface
+class GetHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -24,11 +24,12 @@ class ListHandler implements RequestHandlerInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        OrderService $orderService
-    ) {
-        $this->responseFactory     = $responseFactory;
-        $this->streamFactory       = $streamFactory;
+        StreamFactoryInterface   $streamFactory,
+        OrderService             $orderService
+    )
+    {
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory = $streamFactory;
         $this->orderService = $orderService;
     }
 
@@ -41,15 +42,16 @@ class ListHandler implements RequestHandlerInterface
         $requestBody = $request->getParsedBody();
 
         // Set record params
-        $params = [
-            'user_id' => $account['id'],
-            'page'    => $requestBody['page'] ?? 1,
-            'limit'   => $requestBody['limit'] ?? 100,
+        $requestBody['user_id'] = $account['id'];
+        // Get list of Orders
+        $result = $this->orderService->getOrder($requestBody, $account);
+        // Set the response data
+        $responseBody = [
+            'result' => true,
+            'data' => $result,
+            'error' => null,
         ];
 
-        // Get list of Orders
-        $result = $this->orderService->getOrderList($params,$account);
-
-        return new JsonResponse($result);
+        return new JsonResponse($responseBody);
     }
 }

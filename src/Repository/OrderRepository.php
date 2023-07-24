@@ -74,20 +74,16 @@ class OrderRepository implements OrderRepositoryInterface
     public function getOrderList(array $params = []): HydratingResultSet|array
     {
 
-        $where = ['receiver_id IN (' . $params['user_id'] . ') OR  sender_id IN (' . $params['user_id'] . ') OR type="global" '];
+        $where = [];
         if (isset($params['status']) && !empty($params['status'])) {
             $where['status'] = $params['status'];
         }
-        if (isset($params['viewed']) && !empty($params['viewed'])) {
-            $where['viewed'] = $params['viewed'];
-        }
-        if (isset($params['sent']) && !empty($params['sent'])) {
-            $where['sent'] = $params['sent'];
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $where['user_id'] = $params['user_id'];
         }
         if (isset($params['id']) && !empty($params['id'])) {
             $where['id'] = $params['id'];
         }
-
 
         $sql = new Sql($this->db);
         $select = $sql->select($this->tableOrder)->where($where)->order($params['order'])->offset($params['offset'])->limit($params['limit']);
