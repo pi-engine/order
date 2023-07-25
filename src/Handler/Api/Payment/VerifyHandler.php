@@ -43,12 +43,12 @@ class VerifyHandler implements RequestHandlerInterface
         // Set record params
         $params = [
             'user_id' => $account['id'],
-            'page'    => $requestBody['page'] ?? 1,
-            'limit'   => $requestBody['limit'] ?? 100,
+            'authority'    => $requestBody['authority'] ?? 1,
+            'slug'   => $requestBody['slug'] ?? 100,
         ];
 
         // Get list of Orders
-        $result = $this->orderService->getOrderList($params,$account);
+        $result = $this->orderService->verifyPayment($params,$account);
 
         return new JsonResponse($result);
     }

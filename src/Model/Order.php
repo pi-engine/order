@@ -17,6 +17,7 @@ class Order
     private ?int $total_amount;
     private ?string $information;
     private ?string $payment_method;
+    private ?string $payment;
     private int $time_create;
     private int $time_update;
     private int $time_delete;
@@ -34,6 +35,7 @@ class Order
      * @param int|null $gift
      * @param int|null $total_amount
      * @param string|null $information
+     * @param string|null $payment
      * @param string|null $payment_method
      * @param int $time_create
      * @param int $time_update
@@ -53,6 +55,7 @@ class Order
         ?int    $total_amount,
         ?string $information,
         ?string $payment_method,
+        ?string $payment,
         int     $time_create,
         int     $time_update,
         int     $time_delete
@@ -71,6 +74,7 @@ class Order
         $this->total_amount = $total_amount;
         $this->information = $information;
         $this->payment_method = $payment_method;
+        $this->payment = $payment;
         $this->time_create = $time_create;
         $this->time_update = $time_update;
         $this->time_delete = $time_delete;
@@ -282,6 +286,22 @@ class Order
     public function setPaymentMethod(?string $payment_method): void
     {
         $this->payment_method = $payment_method;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPayment(): ?string
+    {
+        return $this->payment;
+    }
+
+    /**
+     * @param string|null $payment
+     */
+    public function setPayment(?string $payment): void
+    {
+        $this->payment = $payment;
     }
 
     /**

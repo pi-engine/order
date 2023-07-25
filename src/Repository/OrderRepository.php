@@ -168,7 +168,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $update = new Update($this->tableOrder);
         $update->set($params);
-        $update->where(['id' => $params['id'], 'receiver_id' => $params['receiver_id']]);
+        $update->where(['id' => $params['id']]);
 
         $sql = new Sql($this->db);
         $statement = $sql->prepareStatementForSqlObject($update);

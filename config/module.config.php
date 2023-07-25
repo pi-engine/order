@@ -231,7 +231,7 @@ return [
                                         'module' => 'order',
                                         'section' => 'api',
                                         'package' => 'payment',
-                                        'handler' => 'update',
+                                        'handler' => 'verify',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
                                             SecurityMiddleware::class,

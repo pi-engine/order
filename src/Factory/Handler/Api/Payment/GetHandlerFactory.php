@@ -5,7 +5,7 @@ namespace Order\Factory\Handler\Api\Payment;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Order\Handler\Api\Payment\GetHandler;
-use Order\Service\PaymentService;
+use Order\Service\OrderService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -27,7 +27,7 @@ class GetHandlerFactory implements FactoryInterface
         return new GetHandler(
             $container->get(ResponseFactoryInterface::class),
             $container->get(StreamFactoryInterface::class),
-            $container->get(PaymentService::class)
+            $container->get(OrderService::class)
         );
     }
 }

@@ -19,19 +19,19 @@ class GetHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var PaymentService */
-    protected PaymentService $paymentService;
+    /** @var OrderService */
+    protected OrderService $paymentService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        PaymentService           $paymentService
+        OrderService             $orderService
     )
     {
         $this->responseFactory = $responseFactory;
         $this->streamFactory = $streamFactory;
-        $this->paymentService = $paymentService;
+        $this->orderService = $orderService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -45,14 +45,9 @@ class GetHandler implements RequestHandlerInterface
         $requestBody['user_id'] = $account['id'];
 
         // Get list of Orders
-        $result = $this->paymentService->createLink($requestBody, $account);
+        $result = $this->orderService->createLink($requestBody, $account);
         // Set the response data
-        $responseBody = [
-            'result' => true,
-            'data' => $result,
-            'error' => null,
-        ];
 
-        return new JsonResponse($responseBody);
+        return new JsonResponse($result);
     }
 }

@@ -5,6 +5,7 @@ namespace Order\Factory\Service;
 use Content\Service\ItemService;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Order\Service\PaymentService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Order\Repository\OrderRepositoryInterface;
@@ -29,6 +30,7 @@ class OrderServiceFactory implements FactoryInterface
             $container->get(OrderRepositoryInterface::class),
             $container->get(ItemService::class),
             $container->get(AccountService::class),
+            $container->get(PaymentService::class),
             $container->get(UtilityService::class)
         );
     }

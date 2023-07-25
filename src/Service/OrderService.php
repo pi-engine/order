@@ -17,6 +17,7 @@ class OrderService implements ServiceInterface
     protected ItemService $contentItemService;
 
     protected AccountService $accountService;
+    protected PaymentService $paymentService;
     protected UtilityService $utilityService;
 
     /**
@@ -26,12 +27,14 @@ class OrderService implements ServiceInterface
         OrderRepositoryInterface $orderRepository,
         ItemService              $contentItemService,
         AccountService           $accountService,
+        PaymentService           $paymentService,
         UtilityService           $utilityService
     )
     {
         $this->orderRepository = $orderRepository;
         $this->contentItemService = $contentItemService;
         $this->accountService = $accountService;
+        $this->paymentService = $paymentService;
         $this->utilityService = $utilityService;
     }
 
@@ -81,10 +84,13 @@ class OrderService implements ServiceInterface
      *
      * @return array
      */
-    public function getOrder($params,$account): array
+    public function getOrder($params, $account): array
     {
-        $order = $this->orderRepository->getOrder($params);
-        return $this->canonizeOrder($order);
+        //        if ($order && !$order['payment']) {
+        //            $order['payment'] = $this->paymentService->buildLink($order);
+        //            $this->orderRepository->updateOrder(['id' => $order['id'], 'payment' => json_encode($order['payment'])]);
+        //        }
+        return $this->canonizeOrder($this->orderRepository->getOrder($params));
     }
 
 
@@ -142,52 +148,6 @@ class OrderService implements ServiceInterface
         return [$orderItem->getId()];
     }
 
-//    /**
-//     * @param $order
-//     *
-//     * @return array
-//     */
-//    public function canonizeOrder($order): array
-//    {
-//        if (empty($order)) {
-//            return [];
-//        }
-//
-//        if (is_object($order)) {
-//            $order = [
-//                'id' => (int)$order->getId(),
-//                'sender_id' => $order->getSenderId(),
-//                'receiver_id' => $order->getReceiverId(),
-//                'type' => $order->getType(),
-//                'status' => $order->getStatus(),
-//                'viewed' => $order->getViewed(),
-//                'sent' => $order->getSent(),
-//                'time_create' => date('Y M d H:i:s', $order->getTimeCreate()),
-//                'time_update' => $order->getTimeUpdate(),
-//                'information' => $order->getInformation(),
-//            ];
-//        } else {
-//            $order = [
-//                'id' => (int)$order['id'],
-//                'sender_id' => 3,
-//                'receiver_id' => $order['receiver_id'],
-//                'type' => $order['type'],
-//                'status' => $order['status'],
-//                'viewed' => $order['viewed'],
-//                'sent' => $order['sent'],
-//                'time_create' => date('m/d/Y H:i:s', $order['time_create']),
-//                'time_update' => $order['time_update'],
-//                'information' => $order['information'],
-//            ];
-//        }
-//
-//        // Set information
-//        $information = (!empty($order['information'])) ? json_decode($order['information'], true) : [];
-//        unset($order['information']);
-//
-//        return array_merge($order, $information);
-//    }
-
     private function orderSlugGenerator(int $user_id, string $type, int $timestamp): string
     {
         return sprintf('user_%d_%s_%d', $user_id, strtolower(str_replace(' ', '_', $type)), $timestamp);
@@ -213,9 +173,10 @@ class OrderService implements ServiceInterface
                 'discount' => $order->getDiscount(),
                 'gift' => $order->getGift(),
                 'payment_method' => $order->getPaymentMethod(),
+                'payment' => $order->getPayment(),
                 'time_create' => $order->getTimeCreate(),
                 'total_amount' => $order->getTotalAmount(),
-                'information' => (!empty($order->getInformation())) ? json_decode($order->getInformation(), true) : [],
+                'information' => $order->getInformation(),
             ];
         } else {
             $order = [
@@ -231,15 +192,19 @@ class OrderService implements ServiceInterface
                 'discount' => $order['discount'],
                 'gift' => $order['gift'],
                 'payment_method' => $order['payment_method'],
+                'payment' => $order['payment'],
                 'time_create' => $order['time_create'],
                 'total_amount' => $order['total_amount'],
-                'information' => (!empty($order['information'])) ? json_decode($order['information'], true) : [],
+                'information' => $order['information'],
             ];
         }
 
+        $order['information'] = (!empty($order['information'])) ? json_decode($order['information'], true) : [];
+        $order['payment'] = (!empty($order['payment'])) ? json_decode($order['payment'], true) : [];
         $order["time_create_view"] = $this->utilityService->date($order['time_create']);
 //        $order["total_amount_view"] = $this->utilityService->setCurrency($order['total_amount']);
         $order["total_amount_view"] = $order['total_amount'] . ' تومان';
+
         return ($order);
     }
 
@@ -261,6 +226,77 @@ class OrderService implements ServiceInterface
         $json['cart'] = $order;
         $params['information'] = json_encode($json, JSON_UNESCAPED_UNICODE);
         return $this->canonizeOrder($this->orderRepository->addOrder($params));
+    }
+
+    public function verifyPayment(array $params, mixed $account): array
+    {
+
+        $order = $this->getOrder(['slug' => $params['slug']], $account);
+
+        if (!sizeof($order)) {
+            return [
+                'result' => false,
+                'data' => null,
+                'error' => [
+                    'code' => 404,
+                    'message' => "There is no order with the entered parameters!",
+                ],
+            ];
+        }
+
+        if (!$order['payment'] || $order['payment']['authority'] != $params['authority']) {
+            return [
+                'result' => false,
+                'data' => null,
+                'error' => [
+                    'code' => 401,
+                    'message' => "Payment information is inconsistent with your order information!",
+                ],
+            ];
+        }
+
+        $result = $this->paymentService->verifyPayment($order, $params);
+        return $result;
+
+    }
+
+    public function createLink(object|array $params, mixed $account)
+    {
+
+        $order = $this->canonizeOrder($this->orderRepository->getOrder($params));
+
+        if (!sizeof($order)) {
+            return [
+                'result' => false,
+                'data' => null,
+                'error' => [
+                    'code' => 404,
+                    'message' => "There is no order with the entered parameters!",
+                ],
+            ];
+        }
+
+        if ($order['status'] == 'waiting') {
+            $order['payment'] = $this->paymentService->buildLink($order);
+            $this->orderRepository->updateOrder(['id' => $order['id'], 'payment' => json_encode($order['payment']), 'time_update' => time()]);
+            return [
+                'result' => true,
+                'data' => [
+                    "url" => $order['payment']['url']
+                ],
+                'error' => [],
+            ];
+        }
+
+        return [
+            'result' => true,
+            'data' => [
+                "url" => "/"
+            ],
+            'error' => [],
+        ];
+
+
     }
 
 

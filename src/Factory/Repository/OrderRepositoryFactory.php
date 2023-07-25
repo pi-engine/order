@@ -40,6 +40,7 @@ class OrderRepositoryFactory implements FactoryInterface
                 0,
                 0,
                 0,
+                0,
                 '',
                 0,
                 0,
