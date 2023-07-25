@@ -79,6 +79,32 @@ class OrderService implements ServiceInterface
     }
 
     /**
+     * @param $params
+     *
+     * @return array
+     */
+    public function getReserveOrderList($params, $account): array|null
+    {
+        $limit = $params['limit'] ?? 25;
+        $page = $params['page'] ?? 1;
+        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
+        $offset = ($page - 1) * $limit;
+        $contentParams = [
+            "order" => $order,
+            "offset" => $offset,
+            "limit" => $limit,
+        ];
+        if (isset($params['user_id'])) {
+            $contentParams['user_id'] = (int)$params['user_id'];
+        }
+        $contentParams['type'] = 'module_order';
+
+        return $this->contentItemService->getItemList($contentParams);
+
+    }
+
+
+    /**
      * @param string $parameter
      * @param string $type
      *
@@ -100,8 +126,8 @@ class OrderService implements ServiceInterface
         $ordered = $this->contentItemService->getItem($params['item_id'], 'id', ['type' => 'tour']);
         $orderParams = [
             'user_id' => $params['user_id'],
-            'slug' => $this->orderSlugGenerator($params['user_id'], $params['type'], time()),
-            'type' => $params['type'],
+            'slug' => $this->orderSlugGenerator($params['user_id'], $params['order_type'], time()),
+            'order_type' => $params['order_type'],
             'information' => json_encode(['order_history' => ['time_create' => time()]]),
             'time_create' => time()
         ];
