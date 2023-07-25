@@ -122,7 +122,7 @@ class PaymentService implements ServiceInterface
     public function verifyPayment(array $order, array $params)
     {
 
-        $data = array("merchant_id" => $this->config['gateway']['zarinpal']['merchant_id'], "authority" => $params['authority'] ?? '', "amount" => $order['total_amount'] ?? 0);
+        $data = array("merchant_id" => $this->config['gateway']['zarinpal']['merchant_id'], "authority" => $params['authority'] ?? '', "amount" => ($order['total_amount']*10) ?? 0);
         $jsonData = json_encode($data);
         $ch = curl_init($this->config['gateway']['zarinpal']['url']['verify']);
         curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v4');

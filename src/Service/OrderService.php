@@ -256,11 +256,18 @@ class OrderService implements ServiceInterface
         }
 
         $result = $this->paymentService->verifyPayment($order, $params);
+        if ($result["result"]) {
+            /// update status of order in first ( if the decode encode maybe has bug and error)
+            $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid']);
+            $payment = json_decode($order["payment"].true);
+            $payment["result"] = $result;
+            $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid', 'payment' => json_encode($payment)]);
+        }
         return $result;
 
     }
 
-    public function createLink(object|array $params, mixed $account)
+    public function createLink(object|array $params, mixed $account): array
     {
 
         $order = $this->canonizeOrder($this->orderRepository->getOrder($params));
