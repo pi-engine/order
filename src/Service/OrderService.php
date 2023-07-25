@@ -259,7 +259,7 @@ class OrderService implements ServiceInterface
         if ($result["result"]) {
             /// update status of order in first ( if the decode encode maybe has bug and error)
             $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid']);
-            $payment = json_decode($order["payment"],true);
+            //$payment =  ($order["payment"]);
             $payment["result"] = $result;
             $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid', 'payment' => json_encode($payment)]);
         }
