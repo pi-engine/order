@@ -41,16 +41,9 @@ class CreateHandler implements RequestHandlerInterface
         // Get request body
         $requestBody = $request->getParsedBody();
 
-        $params = [
-            'user_id' => $account['id'],
-            'order_type' => 'physical',
-            'entity_type' => $requestBody['entity_type']??'product',
-            'payment_method' => $requestBody['payment_method']??'online',
-            'time_create' => time(),
-        ];
 
         // Get list of notifications
-        $result = $this->orderService->createPhysicalOrder($params,$account);
+        $result = $this->orderService->createPhysicalOrder($requestBody,$account);
 
         // Set result
         $result = [

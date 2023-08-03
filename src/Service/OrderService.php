@@ -234,9 +234,25 @@ class OrderService implements ServiceInterface
         return ($order);
     }
 
-    public function createPhysicalOrder(object|array $params, mixed $account): array
+    public function createPhysicalOrder(object|array $requestBody, mixed $account): array
     {
-        $order = $this->contentItemService->addOrderItem($params, $account);
+        $params = [
+            'user_id' => $account['id'],
+            'order_type' => 'physical',
+            'entity_type' => $requestBody['entity_type'] ?? 'product',
+            'payment_method' => $requestBody['payment_method'] ?? 'online',
+            'time_create' => time(),
+        ];
+
+
+        ///TODO:remove garbage params
+        $requestBody['user_id'] = $account['id'];
+        $requestBody['order_type'] = 'physical';
+        $requestBody['entity_type'] = $requestBody['entity_type'] ?? 'product';
+        $requestBody['payment_method'] = $requestBody['payment_method'] ?? 'online';
+        $requestBody['time_create'] = time();
+
+        $order = $this->contentItemService->addOrderItem($requestBody, $account);
         $price = 0;
         if (!sizeof($order)) {
             return [];
