@@ -243,7 +243,7 @@ class OrderService implements ServiceInterface
         }
         $products = $order['items'];
         foreach ($products as $product)
-            $price += $product['price'];
+            $price += ($product['price'] * $product['count']);
         $params['subtotal'] = $price;
         $params['total_amount'] = $price;
         $params['slug'] = $order['slug'];
