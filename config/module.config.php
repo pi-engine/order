@@ -235,8 +235,8 @@ return [
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
                                             SecurityMiddleware::class,
-                                            AuthenticationMiddleware::class,
-                                            AuthorizationMiddleware::class,
+//                                            AuthenticationMiddleware::class,
+//                                            AuthorizationMiddleware::class,
                                             Handler\Api\Payment\VerifyHandler::class
                                         ),
                                     ],
