@@ -32,6 +32,11 @@ return [
             Handler\Api\Payment\ListHandler::class => Factory\Handler\Api\Payment\ListHandlerFactory::class,
             Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
 
+            ///ADMIN
+            Handler\Admin\GetHandler::class => Factory\Handler\Admin\GetHandlerFactory::class,
+            Handler\Admin\ListHandler::class => Factory\Handler\Admin\ListHandlerFactory::class,
+            Handler\Admin\UpdateHandler::class => Factory\Handler\Admin\UpdateHandlerFactory::class,
+
 
         ],
     ],
@@ -254,6 +259,65 @@ return [
                     'defaults' => [],
                 ],
                 'child_routes' => [
+
+                    'list' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/list',
+                            'defaults' => [
+                                'module' => 'order',
+                                'section' => 'admin',
+                                'package' => 'list',
+                                'handler' => 'list',
+                                'controller' => PipeSpec::class,
+                                'middleware' => new PipeSpec(
+                                    SecurityMiddleware::class,
+                                    AuthenticationMiddleware::class,
+                                    AuthorizationMiddleware::class,
+                                    Handler\Admin\ListHandler::class
+                                ),
+                            ],
+                        ],
+                    ],
+                    'get' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/get',
+                            'defaults' => [
+                                'module' => 'order',
+                                'section' => 'admin',
+                                'package' => 'list',
+                                'handler' => 'get',
+                                'controller' => PipeSpec::class,
+                                'middleware' => new PipeSpec(
+                                    SecurityMiddleware::class,
+                                    AuthenticationMiddleware::class,
+                                    AuthorizationMiddleware::class,
+                                    Handler\Admin\GetHandler::class
+                                ),
+                            ],
+                        ],
+                    ],
+                    'update' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/update',
+                            'defaults' => [
+                                'module' => 'order',
+                                'section' => 'admin',
+                                'package' => 'list',
+                                'handler' => 'update',
+                                'controller' => PipeSpec::class,
+                                'middleware' => new PipeSpec(
+                                    SecurityMiddleware::class,
+                                    AuthenticationMiddleware::class,
+                                    AuthorizationMiddleware::class,
+                                    Handler\Admin\UpdateHandler::class
+                                ),
+                            ],
+                        ],
+                    ],
+
                     // Admin installer
                     'installer' => [
                         'type' => Literal::class,

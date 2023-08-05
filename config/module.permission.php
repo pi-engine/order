@@ -102,5 +102,30 @@ return [
                 'admin',
             ],
         ],
+
+
+
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'list',
+            'handler'     => 'list',
+            'permission' => 'admin-order-list-list',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'list',
+            'handler'     => 'get',
+            'permission' => 'admin-order-list-get',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
     ],
 ];
