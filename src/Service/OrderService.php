@@ -348,5 +348,14 @@ class OrderService implements ServiceInterface
 
     }
 
+    public function updateOrder(array $params, mixed $account): array
+    {
+        $order['status'] = $params['status'] ?? 'unknown';
+        $order['id'] = $params['id'];
+        $order['time_update'] = time();
+        $this->orderRepository->updateOrder($order);
+        return $this->getOrder($params,$account);
+    }
+
 
 }

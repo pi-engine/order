@@ -1,6 +1,18 @@
 <?php
 
 return [
+    'admin'   => [
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'status',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-status-update',
+            'role'        => [
+                'admin',
+            ],
+        ],
+    ],
     'api'   => [
         [
             'module'      => 'order',
