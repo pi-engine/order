@@ -258,8 +258,9 @@ class OrderService implements ServiceInterface
             return [];
         }
         $products = $order['items'];
-        foreach ($products as $product)
-            $price += ($product['price'] * $product['count']);
+        foreach ($products as $product) {
+            $price += ($this->getPrice($product) * $product['count']);
+        }
         $params['subtotal'] = $price;
         $params['total_amount'] = $price;
         $params['slug'] = $order['slug'];
@@ -354,7 +355,26 @@ class OrderService implements ServiceInterface
         $order['id'] = $params['id'];
         $order['time_update'] = time();
         $this->orderRepository->updateOrder($order);
-        return $this->getOrder($params,$account);
+        return $this->getOrder($params, $account);
+    }
+
+    /// update meta price from last price when change cart to order
+    private function getPrice(mixed $product)
+    {
+        $price = 0;
+        if (isset($product['price'])) {
+            $price = $product['price'];
+        }
+        if (isset($product['property'])) {
+            if (isset($product['property']['meta_selected_data'])) {
+                foreach ($product['property']['meta_selected_data'] as $meta) {
+                    if ($meta["meta_key"] == "price") {
+                        $price = (int)($meta["meta_value"]);
+                    }
+                }
+            }
+        }
+        return $price;
     }
 
 
