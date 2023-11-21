@@ -252,6 +252,28 @@ class OrderService implements ServiceInterface
         $requestBody['payment_method'] = $requestBody['payment_method'] ?? 'online';
         $requestBody['time_create'] = time();
 
+        $cart = $this->contentItemService->getCart(['slug' => 'cart-' . $account['id']]);
+
+        $forbiddenList = [];
+
+        foreach ($cart as $product) {
+            if ((int)$product['count'] > (int)$this->getStockCount($this->contentItemService->getItem($product['slug'], 'slug')))
+                $forbiddenList[] = $product;
+        }
+        if (!empty($forbiddenList)) {
+            return [
+                'result' => false,
+                'data' => $forbiddenList,
+                'error' => [],
+            ];
+        }
+
+        return [
+            'result' => true,
+            'data' => $forbiddenList,
+            'error' => [],
+        ];
+
         $order = $this->contentItemService->addOrderItem($requestBody, $account);
         $price = 0;
         if (!sizeof($order)) {
@@ -268,7 +290,12 @@ class OrderService implements ServiceInterface
         $json = $params;
         $json['cart'] = $order;
         $params['information'] = json_encode($json, JSON_UNESCAPED_UNICODE);
-        return $this->canonizeOrder($this->orderRepository->addOrder($params));
+        $result = $this->canonizeOrder($this->orderRepository->addOrder($params));
+        return [
+            'result' => true,
+            'data' => $result,
+            'error' => [],
+        ];
     }
 
     public function verifyPayment(array $params, mixed $account): array
@@ -377,5 +404,21 @@ class OrderService implements ServiceInterface
         return $price;
     }
 
+    private function getStockCount($item)
+    {
+        $stock = 0;
+
+        if (isset($item['meta'])) {
+            if (count($item['meta']) > 0) {
+                foreach ($item['meta'] as $meta) {
+                    if ($meta['meta_key'] == 'stock') {
+                        $stock = $meta['meta_value'];
+                        break; // Break the loop if 'stock' is found
+                    }
+                }
+            }
+        }
+        return $stock;
+    }
 
 }

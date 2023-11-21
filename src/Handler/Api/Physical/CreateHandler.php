@@ -45,12 +45,7 @@ class CreateHandler implements RequestHandlerInterface
         // Get list of notifications
         $result = $this->orderService->createPhysicalOrder($requestBody,$account);
 
-        // Set result
-        $result = [
-            'result' => true,
-            'data'   => $result,
-            'error'  => [],
-        ];
+
 
         return new JsonResponse($result);
     }
