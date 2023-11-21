@@ -257,23 +257,21 @@ class OrderService implements ServiceInterface
         $forbiddenList = [];
 
         foreach ($cart as $product) {
-            $originalProduct =$this->contentItemService->getItem($product['slug'], 'slug');
+            $originalProduct = $this->contentItemService->getItem($product['slug'], 'slug');
             if ((int)$product['count'] > (int)$this->getStockCount($originalProduct))
                 $forbiddenList[] = $originalProduct;
         }
         if (!empty($forbiddenList)) {
             return [
                 'result' => false,
-                'data' => $forbiddenList,
+                'data' =>
+                    [
+                        'list' => $forbiddenList,
+                    ],
                 'error' => [],
             ];
         }
 
-        return [
-            'result' => true,
-            'data' => $forbiddenList,
-            'error' => [],
-        ];
 
         $order = $this->contentItemService->addOrderItem($requestBody, $account);
         $price = 0;
