@@ -301,7 +301,6 @@ class OrderService implements ServiceInterface
     {
 
         $order = $this->getOrder(['slug' => $params['slug']], $account);
-
         if (!sizeof($order)) {
             return [
                 'result' => false,
@@ -326,11 +325,33 @@ class OrderService implements ServiceInterface
 
         $result = $this->paymentService->verifyPayment($order, $params);
         if ($result["result"]) {
-            /// update status of order in first ( if the decode encode maybe has bug and error)
-            $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid']);
-            //$payment =  ($order["payment"]);
-            $payment["result"] = $result;
-            $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid', 'payment' => json_encode($payment)]);
+            if ($order['status'] != 'paid') {
+                /// update status of order in first ( if the decode encode maybe has bug and error)
+                $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid']);
+                $payment["result"] = $result;
+                $this->orderRepository->updateOrder(['id' => $order['id'], 'status' => 'paid', 'payment' => json_encode($payment)]);
+                if (isset($order['information'])) {
+                    if (isset($order['information']['cart'])) {
+                        if (isset($order['information']['cart']['items'])) {
+                            $products = $order['information']['cart']['items'];
+                            foreach ($products as $product) {
+                                $originalProduct = $this->contentItemService->getItem($product['slug'], 'slug');
+                                $oldStock = $this->getStockCount($originalProduct);
+                                $newStockValue = ((int)$oldStock > (int)$product['count']) ? ((int)$oldStock - (int)$product['count']) : 0;
+                                for ($i = 0; $i < sizeof($originalProduct['meta']); $i++) {
+                                    if ($originalProduct['meta'][$i]['meta_key'] == 'stock') {
+                                        $originalProduct['meta'][$i]['meta_value'] = $newStockValue;
+                                        break; // Break the loop if 'stock' is found
+                                    }
+                                }
+                                $this->contentItemService->updateEntity($originalProduct,$account);
+                                return $originalProduct;
+                            }
+                        }
+                    }
+                }
+            }
+
         }
         return $result;
 
