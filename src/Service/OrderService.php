@@ -344,8 +344,8 @@ class OrderService implements ServiceInterface
                                         break; // Break the loop if 'stock' is found
                                     }
                                 }
-                                $this->contentItemService->updateEntity($originalProduct,$account);
-                                return $originalProduct;
+                                $originalProduct['mode'] = 'entity';
+                                $this->contentItemService->updateEntity($originalProduct, $account);
                             }
                         }
                     }
