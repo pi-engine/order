@@ -257,8 +257,9 @@ class OrderService implements ServiceInterface
         $forbiddenList = [];
 
         foreach ($cart as $product) {
-            if ((int)$product['count'] > (int)$this->getStockCount($this->contentItemService->getItem($product['slug'], 'slug')))
-                $forbiddenList[] = $product;
+            $originalProduct =$this->contentItemService->getItem($product['slug'], 'slug');
+            if ((int)$product['count'] > (int)$this->getStockCount($originalProduct))
+                $forbiddenList[] = $originalProduct;
         }
         if (!empty($forbiddenList)) {
             return [
