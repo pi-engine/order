@@ -33,6 +33,7 @@ return [
             Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
 
             ///ADMIN
+            Handler\Admin\DashboardHandler::class => Factory\Handler\Admin\DashboardHandlerFactory::class,
             Handler\Admin\GetHandler::class => Factory\Handler\Admin\GetHandlerFactory::class,
             Handler\Admin\ListHandler::class => Factory\Handler\Admin\ListHandlerFactory::class,
             Handler\Admin\UpdateHandler::class => Factory\Handler\Admin\UpdateHandlerFactory::class,
@@ -296,6 +297,25 @@ return [
                                     AuthenticationMiddleware::class,
                                     AuthorizationMiddleware::class,
                                     Handler\Admin\GetHandler::class
+                                ),
+                            ],
+                        ],
+                    ],
+                    'dashboard' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/dashboard',
+                            'defaults' => [
+                                'module' => 'order',
+                                'section' => 'admin',
+                                'package' => 'list',
+                                'handler' => 'get',
+                                'controller' => PipeSpec::class,
+                                'middleware' => new PipeSpec(
+                                    SecurityMiddleware::class,
+                                    AuthenticationMiddleware::class,
+                                    AuthorizationMiddleware::class,
+                                    Handler\Admin\DashboardHandler::class
                                 ),
                             ],
                         ],
