@@ -345,6 +345,7 @@ class OrderService implements ServiceInterface
                                     }
                                 }
                                 $originalProduct['mode'] = 'entity';
+                                $originalProduct['status'] = 1;
                                 $this->contentItemService->updateEntity($originalProduct, $account);
                             }
                         }
