@@ -94,7 +94,7 @@ class OrderRepository implements OrderRepositoryInterface
             $where[' 1>0 AND information LIKE ?'] =  '%"zip_code":"'.$params['postal_code'].'"%';
         }
         if (isset($params['name'])&&!empty($params['name'])) {
-            $where[' 2>1 AND information LIKE ?'] ='%'.$params['postal_code'].'%';
+            $where[' 2>1 AND information LIKE ?'] ='%'.$params['name'].'%';
         }
         if (isset($params['phone'])&&!empty($params['phone'])) {
             $where[' 3>2 AND information LIKE ?'] ='%"phone":"'.$params['phone'].'"%';
@@ -142,7 +142,7 @@ class OrderRepository implements OrderRepositoryInterface
             $where[' 1>0 AND information LIKE ?'] =  '%"zip_code":"'.$params['postal_code'].'"%';
         }
         if (isset($params['name'])&&!empty($params['name'])) {
-            $where[' 2>1 AND information LIKE ?'] ='%'.$params['postal_code'].'%';
+            $where[' 2>1 AND information LIKE ?'] ='%'.$params['name'].'%';
         }
         if (isset($params['phone'])&&!empty($params['phone'])) {
             $where[' 3>2 AND information LIKE ?'] ='%"phone":"'.$params['phone'].'"%';
