@@ -2,10 +2,9 @@
 
 namespace Order\Factory\Handler\Admin;
 
-use Club\Handler\Api\B2b\DashboardHandler;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Order\Handler\Admin\GetHandler;
+use Order\Handler\Admin\DashboardHandler; 
 use Order\Service\OrderService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
