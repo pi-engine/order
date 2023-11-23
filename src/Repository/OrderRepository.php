@@ -84,6 +84,27 @@ class OrderRepository implements OrderRepositoryInterface
         if (isset($params['id']) && !empty($params['id'])) {
             $where['id'] = $params['id'];
         }
+        if (isset($params['payment_method']) && !empty($params['payment_method'])) {
+            $where['payment_method'] = $params['payment_method'];
+        }
+        if (isset($params['ref_id']) && !empty($params['ref_id'])) {
+            $where['payment LIKE ?'] = '%' . $params['ref_id'] . '%';
+        }
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $where[' 1>0 AND information LIKE ?'] =  '%"zip_code":"'.$params['postal_code'].'"%';
+        }
+        if (isset($params['name'])&&!empty($params['name'])) {
+            $where[' 2>1 AND information LIKE ?'] ='%'.$params['postal_code'].'%';
+        }
+        if (isset($params['phone'])&&!empty($params['phone'])) {
+            $where[' 3>2 AND information LIKE ?'] ='%"phone":"'.$params['phone'].'"%';
+        }
+        if (isset($params['address'])&&!empty($params['address'])) {
+            $where[' 4>3 AND information LIKE ?'] = '%'.$params['address'].'%';
+        }
+        if (isset($params['product'])&&!empty($params['product'])) {
+            $where[' 5>4 AND information LIKE ?'] = '%"slug":"'.$params['product'].'"%';
+        }
 
         $sql = new Sql($this->db);
         $select = $sql->select($this->tableOrder)->where($where)->order($params['order'])->offset($params['offset'])->limit($params['limit']);
@@ -99,7 +120,47 @@ class OrderRepository implements OrderRepositoryInterface
 
         return $resultSet;
     }
+    public function getOrderCount(array $params = []): int
+    {
+        $where = [];
+        if (isset($params['status']) && !empty($params['status'])) {
+            $where['status'] = $params['status'];
+        }
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $where['user_id'] = $params['user_id'];
+        }
+        if (isset($params['id']) && !empty($params['id'])) {
+            $where['id'] = $params['id'];
+        }
+        if (isset($params['payment_method']) && !empty($params['payment_method'])) {
+            $where['payment_method'] = $params['payment_method'];
+        }
+        if (isset($params['ref_id']) && !empty($params['ref_id'])) {
+            $where['payment LIKE ?'] = '%' . $params['ref_id'] . '%';
+        }
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $where[' 1>0 AND information LIKE ?'] =  '%"zip_code":"'.$params['postal_code'].'"%';
+        }
+        if (isset($params['name'])&&!empty($params['name'])) {
+            $where[' 2>1 AND information LIKE ?'] ='%'.$params['postal_code'].'%';
+        }
+        if (isset($params['phone'])&&!empty($params['phone'])) {
+            $where[' 3>2 AND information LIKE ?'] ='%"phone":"'.$params['phone'].'"%';
+        }
+        if (isset($params['address'])&&!empty($params['address'])) {
+            $where[' 4>3 AND information LIKE ?'] = '%'.$params['address'].'%';
+        }
+        if (isset($params['product'])&&!empty($params['product'])) {
+            $where[' 5>4 AND information LIKE ?'] = '%"slug":"'.$params['product'].'"%';
+        }
 
+        $columns = ['count' => new Expression('count(*)')];
+        $sql = new Sql($this->db);
+        $select = $sql->select($this->tableOrder)->columns($columns)->where($where);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $row = $statement->execute()->current();
+        return (int)$row['count'];
+    }
 
     /**
      * @param array $params

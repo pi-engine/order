@@ -40,14 +40,10 @@ class ListHandler implements RequestHandlerInterface
         // Get request body
         $requestBody = $request->getParsedBody();
 
-        // Set record params
-        $params = [
-            'page'    => $requestBody['page'] ?? 1,
-            'limit'   => $requestBody['limit'] ?? 100,
-        ];
+
 
         // Get list of Orders
-        $result = $this->orderService->getOrderList($params,$account);
+        $result = $this->orderService->getOrderList($requestBody,$account);
 
         return new JsonResponse($result);
     }
