@@ -148,7 +148,7 @@ class PaymentService implements ServiceInterface
                 ],
             ];
         } else {
-            if ($result['data']['code'] == 100) {
+            if (isset($result['data']['code'])&&$result['data']['code'] == 100) {
                 return [
                     'result' => true,
                     'data' => [
