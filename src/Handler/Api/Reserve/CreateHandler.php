@@ -47,6 +47,7 @@ class CreateHandler implements RequestHandlerInterface
             'order_type' => 'reserve',
             'entity_type' => 'tour',
             'ordered_type' => 'tour',
+            'type' => 'tour',
             'persons_count' => (int)$requestBody['count'],
             'persons' => json_decode($requestBody['information'], true),
             'item_id' => $requestBody['item_id'],

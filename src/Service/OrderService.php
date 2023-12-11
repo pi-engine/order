@@ -54,35 +54,35 @@ class OrderService implements ServiceInterface
             "offset" => $offset,
             "limit" => $limit,
         ];
-        if (isset($params['id'])&&!empty($params['id'])) {
+        if (isset($params['id']) && !empty($params['id'])) {
             $contentParams['id'] = (int)$params['id'];
         }
-        if (isset($params['user_id'])&&!empty($params['user_id'])) {
-            $contentParams['user_id'] = explode(',',$params['user_id']);
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $contentParams['user_id'] = explode(',', $params['user_id']);
         }
-        if (isset($params['status'])&&!empty($params['status'])) {
-            $contentParams['status'] =  $params['status'];
+        if (isset($params['status']) && !empty($params['status'])) {
+            $contentParams['status'] = $params['status'];
         }
-        if (isset($params['payment_method'])&&!empty($params['payment_method'])) {
-            $contentParams['payment_method'] =  $params['payment_method'];
+        if (isset($params['payment_method']) && !empty($params['payment_method'])) {
+            $contentParams['payment_method'] = $params['payment_method'];
         }
-        if (isset($params['ref_id'])&&!empty($params['ref_id'])) {
-            $contentParams['ref_id'] =  $params['ref_id'];
+        if (isset($params['ref_id']) && !empty($params['ref_id'])) {
+            $contentParams['ref_id'] = $params['ref_id'];
         }
-        if (isset($params['postal_code'])&&!empty($params['postal_code'])) {
-            $contentParams['postal_code'] =  $params['postal_code'];
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $contentParams['postal_code'] = $params['postal_code'];
         }
-        if (isset($params['name'])&&!empty($params['name'])) {
-            $contentParams['name'] =  $params['name'];
+        if (isset($params['name']) && !empty($params['name'])) {
+            $contentParams['name'] = $params['name'];
         }
-        if (isset($params['phone'])&&!empty($params['phone'])) {
-            $contentParams['phone'] =  $params['phone'];
+        if (isset($params['phone']) && !empty($params['phone'])) {
+            $contentParams['phone'] = $params['phone'];
         }
-        if (isset($params['address'])&&!empty($params['address'])) {
-            $contentParams['address'] =  $params['address'];
+        if (isset($params['address']) && !empty($params['address'])) {
+            $contentParams['address'] = $params['address'];
         }
-        if (isset($params['product'])&&!empty($params['product'])) {
-            $contentParams['product'] =  $params['product'];
+        if (isset($params['product']) && !empty($params['product'])) {
+            $contentParams['product'] = $params['product'];
         }
 
 
@@ -128,7 +128,19 @@ class OrderService implements ServiceInterface
         }
         $contentParams['type'] = 'module_order';
 
-        return $this->contentItemService->getItemList($contentParams);
+        $originalList = $this->contentItemService->getItemList($contentParams);
+
+        if (isset($originalList['data'])) {
+            if (isset($originalList['data']['list'])) {
+                $orderList = $originalList['data']['list'];
+                for ($i = 0; $i < sizeof($orderList); $i++) {
+                    $orderList[$i]['time_create_view'] = $this->utilityService->date($orderList[$i]['time_create']);
+                }
+                $originalList['data']['list'] = $orderList;
+            }
+        }
+
+        return $originalList;
 
     }
 
