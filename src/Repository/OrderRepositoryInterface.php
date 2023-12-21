@@ -16,4 +16,6 @@ interface OrderRepositoryInterface
     public function updateOrder(array $params): object|array;
 
     public function deleteOrder(array $params): void;
+
+    public function getCustomerCount();
 }

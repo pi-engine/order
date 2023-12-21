@@ -85,6 +85,22 @@ class OrderService implements ServiceInterface
             $contentParams['product'] = $params['product'];
         }
 
+        if (isset($params['data_from'])) {
+            $contentParams['data_from'] = strtotime(
+                ($params['data_from']) != null
+                    ? sprintf('%s 00:00:00', $params['data_from'])
+                    : sprintf('%s 00:00:00', date('Y-m-d', strtotime('-1 month')))
+            );
+        }
+
+        if (isset($params['data_to'])) {
+            $contentParams['data_to'] = strtotime(
+                ($params['data_to']) != null
+                    ? sprintf('%s 00:00:00', $params['data_to'])
+                    : sprintf('%s 23:59:59', date('Y-m-d'))
+            );
+        }
+
 
         $rowSet = $this->orderRepository->getOrderList($contentParams);
         $list = [];
@@ -483,4 +499,193 @@ class OrderService implements ServiceInterface
         return $stock;
     }
 
+    public function getTotalSale($params, $account): float|int|string
+    {
+        $limit = $params['limit'] ?? 1000000;
+        $page = $params['page'] ?? 1;
+        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
+        $offset = ($page - 1) * $limit;
+        $contentParams = [
+            "order" => $order,
+            "offset" => $offset,
+            "limit" => $limit,
+        ];
+        if (isset($params['id']) && !empty($params['id'])) {
+            $contentParams['id'] = (int)$params['id'];
+        }
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $contentParams['user_id'] = explode(',', $params['user_id']);
+        }
+        if (isset($params['status']) && !empty($params['status'])) {
+            $contentParams['status'] = $params['status'];
+        }
+        if (isset($params['payment_method']) && !empty($params['payment_method'])) {
+            $contentParams['payment_method'] = $params['payment_method'];
+        }
+        if (isset($params['ref_id']) && !empty($params['ref_id'])) {
+            $contentParams['ref_id'] = $params['ref_id'];
+        }
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $contentParams['postal_code'] = $params['postal_code'];
+        }
+        if (isset($params['name']) && !empty($params['name'])) {
+            $contentParams['name'] = $params['name'];
+        }
+        if (isset($params['phone']) && !empty($params['phone'])) {
+            $contentParams['phone'] = $params['phone'];
+        }
+        if (isset($params['address']) && !empty($params['address'])) {
+            $contentParams['address'] = $params['address'];
+        }
+        if (isset($params['product']) && !empty($params['product'])) {
+            $contentParams['product'] = $params['product'];
+        }
+
+        $rowSet = $this->orderRepository->getOrderList($contentParams);
+        $totalAmount = 0;
+        foreach ($rowSet as $row) {
+            $row = $this->canonizeOrder($row);
+            $totalAmount = $totalAmount + $row['total_amount'];
+        }
+        return $this->utilityService->setCurrency($totalAmount);
+    }
+
+    public function getCustomerCount($params)
+    {
+        $limit = $params['limit'] ?? 1000000;
+        $page = $params['page'] ?? 1;
+        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
+        $offset = ($page - 1) * $limit;
+        $contentParams = [
+            "order" => $order,
+            "offset" => $offset,
+            "limit" => $limit,
+        ];
+        if (isset($params['id']) && !empty($params['id'])) {
+            $contentParams['id'] = (int)$params['id'];
+        }
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $contentParams['user_id'] = explode(',', $params['user_id']);
+        }
+        if (isset($params['status']) && !empty($params['status'])) {
+            $contentParams['status'] = $params['status'];
+        }
+        if (isset($params['payment_method']) && !empty($params['payment_method'])) {
+            $contentParams['payment_method'] = $params['payment_method'];
+        }
+        if (isset($params['ref_id']) && !empty($params['ref_id'])) {
+            $contentParams['ref_id'] = $params['ref_id'];
+        }
+        if (isset($params['postal_code']) && !empty($params['postal_code'])) {
+            $contentParams['postal_code'] = $params['postal_code'];
+        }
+        if (isset($params['name']) && !empty($params['name'])) {
+            $contentParams['name'] = $params['name'];
+        }
+        if (isset($params['phone']) && !empty($params['phone'])) {
+            $contentParams['phone'] = $params['phone'];
+        }
+        if (isset($params['address']) && !empty($params['address'])) {
+            $contentParams['address'] = $params['address'];
+        }
+        if (isset($params['product']) && !empty($params['product'])) {
+            $contentParams['product'] = $params['product'];
+        }
+        return $this->orderRepository->getCustomerCount($contentParams);
+    }
+
+    public function getDailyOrderChart($params): array
+    {
+
+        $params['data_from'] = date('Y-m-d', strtotime('-30 days'));
+        $params['data_to'] = date('Y-m-d', time());
+        $list = $this->getOrderList($params, [])['data']['list'];
+        $groupedData = [];
+
+        // Initialize $groupedData with zero values for each day of the last 30 days
+        $today = date('Y-m-d');
+        $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
+
+        $currentDay = strtotime($thirtyDaysAgo);
+
+        while ($currentDay <= strtotime($today)) {
+            $dayKey = date('Y-m-d', $currentDay);
+
+            $dayKey =  explode(' ',$this->utilityService->date(strtotime($dayKey)))[0];
+            $groupedData[$dayKey] = [
+                'count' => 0,
+                'total_amount' => 0,
+            ];
+            $currentDay = strtotime('+1 day', $currentDay);
+        }
+
+// Process your actual data
+        foreach ($list as $item) {
+            // Convert the timestamp to a date string with the day only
+//            $day = date('Y-m-d', $item['time_create']);
+            $day = explode(' ',$this->utilityService->date($item['time_create']))[0];
+
+            // Increment the count and update the total_amount
+            $groupedData[$day]['count']++;
+            $groupedData[$day]['total_amount'] += $item['total_amount'];
+        }
+
+// Sort by date
+        ksort($groupedData);
+        return [
+            'labels' => array_keys($groupedData),
+            'data' => array_column($groupedData, 'count')
+        ];
+
+    }
+    public function getDailySaleChart($params): array
+    {
+
+        $params['data_from'] = date('Y-m-d', strtotime('-30 days'));
+        $params['data_to'] = date('Y-m-d', time());
+        $list = $this->getOrderList($params, [])['data']['list'];
+        $groupedData = [];
+
+        // Initialize $groupedData with zero values for each day of the last 30 days
+        $today = date('Y-m-d');
+        $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
+
+        $currentDay = strtotime($thirtyDaysAgo);
+
+        while ($currentDay <= strtotime($today)) {
+            $dayKey = date('Y-m-d', $currentDay);
+
+            $dayKey =  explode(' ',$this->utilityService->date(strtotime($dayKey)))[0];
+            $groupedData[$dayKey] = [
+                'count' => 0,
+                'total_amount' => 0,
+            ];
+            $currentDay = strtotime('+1 day', $currentDay);
+        }
+
+// Process your actual data
+        foreach ($list as $item) {
+            // Convert the timestamp to a date string with the day only
+//            $day = date('Y-m-d', $item['time_create']);
+            $day = explode(' ',$this->utilityService->date($item['time_create']))[0];
+
+            // Increment the count and update the total_amount
+            $groupedData[$day]['count']++;
+            $groupedData[$day]['total_amount'] += $item['total_amount'];
+        }
+
+// Sort by date
+        ksort($groupedData);
+        return [
+            'labels' => array_keys($groupedData),
+            'data' => array_column($groupedData, 'total_amount')
+        ];
+
+    }
+
+    public function getDate(){
+        $params['data_from'] =explode(' ',$this->utilityService->date(strtotime('-30 days')))[0];
+        $params['data_to']  =explode(' ',$this->utilityService->date(time()))[0];
+        return $params;
+    }
 }
