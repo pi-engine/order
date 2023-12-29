@@ -8,6 +8,7 @@ use Laminas\Hydrator\ReflectionHydrator;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Order\Model\Order;
 use Order\Model\OrderItem;
+use Order\Model\Discount;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Order\Repository\OrderRepository;
@@ -47,6 +48,7 @@ class OrderRepositoryFactory implements FactoryInterface
                 0,
                 0
             ),
+            new Discount(0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0),
             new OrderItem(
                 0,
                 0,

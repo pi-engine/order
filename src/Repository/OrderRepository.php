@@ -11,6 +11,7 @@ use Laminas\Db\Sql\Predicate\Expression;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Update;
 use Laminas\Hydrator\HydratorInterface;
+use Order\Model\Discount;
 use Order\Model\Order;
 use Order\Model\OrderItem;
 use RuntimeException;
@@ -34,6 +35,13 @@ class OrderRepository implements OrderRepositoryInterface
     private string $tableOrderItem = 'order_item';
 
     /**
+     * Order Discount Table name
+     *
+     * @var string
+     */
+    private string $tableOrderDiscount = 'order_discount';
+
+    /**
      * @var AdapterInterface
      */
     private AdapterInterface $db;
@@ -42,6 +50,10 @@ class OrderRepository implements OrderRepositoryInterface
      * @var Order
      */
     private Order $orderPrototype;
+    /**
+     * @var Discount
+     */
+    private Discount $discountPrototype;
 
     /**
      * @var OrderItem
@@ -57,12 +69,14 @@ class OrderRepository implements OrderRepositoryInterface
         AdapterInterface  $db,
         HydratorInterface $hydrator,
         Order             $orderPrototype,
+        Discount          $discountPrototype,
         OrderItem         $orderItemPrototype
     )
     {
         $this->db = $db;
         $this->hydrator = $hydrator;
         $this->orderPrototype = $orderPrototype;
+        $this->discountPrototype = $discountPrototype;
         $this->orderItemPrototype = $orderItemPrototype;
     }
 
@@ -365,4 +379,40 @@ class OrderRepository implements OrderRepositoryInterface
         $id = $result->getGeneratedValue();
         return $this->getOrderItem(['id' => $id]);
     }
+
+    /**
+     * @param string $parameter
+     * @param string $type
+     *
+     * @return object|array
+     */
+    public function getDiscount($params): object|array
+    {
+        $where = $params;
+
+        $sql = new Sql($this->db);
+        $select = $sql->select($this->tableOrderDiscount)->where($where);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface || !$result->isQueryResult()) {
+            throw new RuntimeException(
+                sprintf(
+                    'Failed retrieving blog post with identifier "%s"; unknown database error.',
+                    ''
+                )
+            );
+        }
+
+        $resultSet = new HydratingResultSet($this->hydrator, $this->discountPrototype);
+        $resultSet->initialize($result);
+        $item = $resultSet->current();
+
+        if (!$item) {
+            return [];
+        }
+
+        return $item;
+    }
+
 }

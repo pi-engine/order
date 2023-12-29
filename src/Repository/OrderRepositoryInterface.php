@@ -18,4 +18,7 @@ interface OrderRepositoryInterface
     public function deleteOrder(array $params): void;
 
     public function getCustomerCount();
+
+    public function getDiscount($params): object|array;
+
 }

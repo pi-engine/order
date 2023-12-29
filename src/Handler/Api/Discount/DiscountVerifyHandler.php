@@ -43,6 +43,7 @@ class DiscountVerifyHandler implements RequestHandlerInterface
 
         $params = [
             'code' => $requestBody['code'] ?? '',
+            'status' => 1,
         ];
 
         $result = $this->discountService->verifyCode($params,$account);
