@@ -151,7 +151,7 @@ class OrderItem
         $this->discount = $discount;
     }
 
-    public function getGift(): ?int
+    public function getGift(): mixed
     {
         return $this->gift;
     }

@@ -13,7 +13,7 @@ class Order
     private ?int $subtotal;
     private ?int $tax;
     private ?int $discount;
-    private ?int $gift;
+    private mixed $gift;
     private ?int $total_amount;
     private ?string $information;
     private ?string $payment_method;
@@ -227,7 +227,7 @@ class Order
     /**
      * @return int|null
      */
-    public function getGift(): ?int
+    public function getGift(): mixed
     {
         return $this->gift;
     }
