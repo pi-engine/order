@@ -31,11 +31,23 @@ class DiscountService implements ServiceInterface
         $this->utilityService = $utilityService;
     }
 
-    public function verifyCode(array $params, mixed $account)
+    public function getDiscount(array $params, mixed $account): array
     {
-        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'],'status'=>1]));
+        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
+        if(empty($discount)){
+            return [];
+        }
+        if (($discount['count_used'] >= $discount['count_limit'])) {
+            return [];
+        }
+        return $discount;
+    }
 
-        if (($discount['count_used'] >= $discount['count_limit']) || empty($discount)) {
+    public function verifyCode(array $params, mixed $account): array
+    {
+        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
+
+        if(empty($discount)){
             return [
                 'result' => false,
                 'data' => new stdClass(),
@@ -46,6 +58,18 @@ class DiscountService implements ServiceInterface
                 ],
             ];
         }
+        if (($discount['count_used'] >= $discount['count_limit'])) {
+            return [
+                'result' => false,
+                'data' => new stdClass(),
+                'status' => 404,
+                'error' => [
+                    'message' => 'Cant find any code!',
+                    'code' => 404
+                ],
+            ];
+        }
+
 
         return [
             'result' => true,
@@ -101,6 +125,12 @@ class DiscountService implements ServiceInterface
         }
 
         return $discount;
+    }
+
+    public function useDiscount(array $discountData, mixed $account): void
+    {
+        $discountData['count_used'] = $discountData['count_used'] + 1;
+        $this->orderRepository->updateDiscount($discountData);
     }
 
 

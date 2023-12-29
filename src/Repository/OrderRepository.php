@@ -415,4 +415,29 @@ class OrderRepository implements OrderRepositoryInterface
         return $item;
     }
 
+    /**
+     * @param array $params
+     *
+     * @return array|object
+     */
+    public function updateDiscount(array $params): object|array
+    {
+        $update = new Update($this->tableOrderDiscount);
+        $update->set($params);
+        $update->where(['code' => $params['code']]);
+
+        $sql = new Sql($this->db);
+        $statement = $sql->prepareStatementForSqlObject($update);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface) {
+            throw new RuntimeException(
+                'Database error occurred during update operation'
+            );
+        }
+        return $this->getDiscount($params);
+    }
+
+
+
 }

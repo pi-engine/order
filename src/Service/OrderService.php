@@ -18,6 +18,7 @@ class OrderService implements ServiceInterface
 
     protected AccountService $accountService;
     protected PaymentService $paymentService;
+    protected DiscountService $discountService;
     protected UtilityService $utilityService;
 
     /**
@@ -28,6 +29,7 @@ class OrderService implements ServiceInterface
         ItemService              $contentItemService,
         AccountService           $accountService,
         PaymentService           $paymentService,
+        DiscountService          $discountService,
         UtilityService           $utilityService
     )
     {
@@ -35,6 +37,7 @@ class OrderService implements ServiceInterface
         $this->contentItemService = $contentItemService;
         $this->accountService = $accountService;
         $this->paymentService = $paymentService;
+        $this->discountService = $discountService;
         $this->utilityService = $utilityService;
     }
 
@@ -293,6 +296,10 @@ class OrderService implements ServiceInterface
 
     public function createPhysicalOrder(object|array $requestBody, mixed $account): array
     {
+
+        $discount = 0;
+        $gift = '';
+
         $params = [
             'user_id' => $account['id'],
             'order_type' => 'physical',
@@ -300,8 +307,6 @@ class OrderService implements ServiceInterface
             'payment_method' => $requestBody['payment_method'] ?? 'online',
             'time_create' => time(),
         ];
-
-
         ///TODO:remove garbage params
         $requestBody['user_id'] = $account['id'];
         $requestBody['order_type'] = 'physical';
@@ -339,9 +344,20 @@ class OrderService implements ServiceInterface
         foreach ($products as $product) {
             $price += ($this->getPrice($product) * $product['count']);
         }
+
+        if (isset($requestBody['discount_code'])) {
+            $discountData = $this->discountService->getDiscount(['code' => $requestBody['discount_code']], $account);
+            if (!empty($discountData)) {
+                $discount = $discountData['value'];
+                $gift = $discountData['code'];
+                $this->discountService->useDiscount($discountData,$account);
+            }
+        }
         $params['subtotal'] = $price;
-        $params['total_amount'] = $price;
+        $params['total_amount'] = ($price - (($discount*$price)/100));
         $params['slug'] = $order['slug'];
+        $params['discount'] = $discount;
+        $params['gift'] = $gift;
 
         $json = $params;
         $json['cart'] = $order;
@@ -611,7 +627,7 @@ class OrderService implements ServiceInterface
         while ($currentDay <= strtotime($today)) {
             $dayKey = date('Y-m-d', $currentDay);
 
-            $dayKey =  explode(' ',$this->utilityService->date(strtotime($dayKey)))[0];
+            $dayKey = explode(' ', $this->utilityService->date(strtotime($dayKey)))[0];
             $groupedData[$dayKey] = [
                 'count' => 0,
                 'total_amount' => 0,
@@ -623,7 +639,7 @@ class OrderService implements ServiceInterface
         foreach ($list as $item) {
             // Convert the timestamp to a date string with the day only
 //            $day = date('Y-m-d', $item['time_create']);
-            $day = explode(' ',$this->utilityService->date($item['time_create']))[0];
+            $day = explode(' ', $this->utilityService->date($item['time_create']))[0];
 
             // Increment the count and update the total_amount
             $groupedData[$day]['count']++;
@@ -638,6 +654,7 @@ class OrderService implements ServiceInterface
         ];
 
     }
+
     public function getDailySaleChart($params): array
     {
 
@@ -655,7 +672,7 @@ class OrderService implements ServiceInterface
         while ($currentDay <= strtotime($today)) {
             $dayKey = date('Y-m-d', $currentDay);
 
-            $dayKey =  explode(' ',$this->utilityService->date(strtotime($dayKey)))[0];
+            $dayKey = explode(' ', $this->utilityService->date(strtotime($dayKey)))[0];
             $groupedData[$dayKey] = [
                 'count' => 0,
                 'total_amount' => 0,
@@ -667,7 +684,7 @@ class OrderService implements ServiceInterface
         foreach ($list as $item) {
             // Convert the timestamp to a date string with the day only
 //            $day = date('Y-m-d', $item['time_create']);
-            $day = explode(' ',$this->utilityService->date($item['time_create']))[0];
+            $day = explode(' ', $this->utilityService->date($item['time_create']))[0];
 
             // Increment the count and update the total_amount
             $groupedData[$day]['count']++;
@@ -683,9 +700,10 @@ class OrderService implements ServiceInterface
 
     }
 
-    public function getDate(){
-        $params['data_from'] =explode(' ',$this->utilityService->date(strtotime('-30 days')))[0];
-        $params['data_to']  =explode(' ',$this->utilityService->date(time()))[0];
+    public function getDate()
+    {
+        $params['data_from'] = explode(' ', $this->utilityService->date(strtotime('-30 days')))[0];
+        $params['data_to'] = explode(' ', $this->utilityService->date(time()))[0];
         return $params;
     }
 }
