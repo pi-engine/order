@@ -19,6 +19,7 @@ return [
             Repository\OrderRepository::class => Factory\Repository\OrderRepositoryFactory::class,
             Service\OrderService::class => Factory\Service\OrderServiceFactory::class,
             Service\PaymentService::class => Factory\Service\PaymentServiceFactory::class,
+            Service\DiscountService::class => Factory\Service\DiscountSErviceFactory::class,
 
             Handler\Api\Reserve\CreateHandler::class => Factory\Handler\Api\Reserve\CreateHandlerFactory::class,
             Handler\Api\Reserve\ListHandler::class => Factory\Handler\Api\Reserve\ListHandlerFactory::class,
@@ -31,6 +32,8 @@ return [
             Handler\Api\Payment\GetHandler::class => Factory\Handler\Api\Payment\GetHandlerFactory::class,
             Handler\Api\Payment\ListHandler::class => Factory\Handler\Api\Payment\ListHandlerFactory::class,
             Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
+
+            Handler\Api\Discount\DiscountVerifyHandler::class => Factory\Handler\Api\Discount\DiscountVerifyHandlerFactory::class,
 
             ///ADMIN
             Handler\Admin\DashboardHandler::class => Factory\Handler\Admin\DashboardHandlerFactory::class,
@@ -246,6 +249,34 @@ return [
 //                                            AuthenticationMiddleware::class,
 //                                            AuthorizationMiddleware::class,
                                             Handler\Api\Payment\VerifyHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'discount' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/discount',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'verify' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/verify',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'discount',
+                                        'handler' => 'verify',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Discount\DiscountVerifyHandler::class
                                         ),
                                     ],
                                 ],

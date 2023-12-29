@@ -1,0 +1,35 @@
+<?php
+
+namespace Order\Factory\Handler\Api\Discount;
+
+use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Order\Handler\Api\Discount\DiscountVerifyHandler;
+use Order\Handler\Api\Payment\VerifyHandler;
+use Order\Service\DiscountService;
+use Order\Service\OrderService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+class DiscountVerifyHandlerFactory implements FactoryInterface
+{
+    /**
+     * @param ContainerInterface $container
+     * @param string             $requestedName
+     * @param null|array         $options
+     *
+     * @return DiscountVerifyHandler
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): DiscountVerifyHandler
+    {
+        return new DiscountVerifyHandler(
+            $container->get(ResponseFactoryInterface::class),
+            $container->get(StreamFactoryInterface::class),
+            $container->get(DiscountService::class)
+        );
+    }
+}

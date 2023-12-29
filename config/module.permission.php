@@ -1,19 +1,19 @@
 <?php
 
 return [
-    'admin'   => [
+    'api'   => [
         [
             'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'status',
-            'handler'     => 'update',
-            'permissions' => 'admin-order-status-update',
+            'section'     => 'api',
+            'package'     => 'discount',
+            'handler'     => 'verify',
+            'permissions' => 'api-order-discount-verify',
             'role'        => [
+                'member',
                 'admin',
             ],
         ],
-    ],
-    'api'   => [
+
         [
             'module'      => 'order',
             'section'     => 'api',
@@ -136,6 +136,18 @@ return [
             'permission' => 'admin-order-list-get',
             'role'        => [
                 'member',
+                'admin',
+            ],
+        ],
+    ],
+    'admin'   => [
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'status',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-status-update',
+            'role'        => [
                 'admin',
             ],
         ],
