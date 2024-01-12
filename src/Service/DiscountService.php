@@ -34,7 +34,7 @@ class DiscountService implements ServiceInterface
     public function getDiscount(array $params, mixed $account): array
     {
         $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
-        if(empty($discount)){
+        if (empty($discount)) {
             return [];
         }
         if (($discount['count_used'] >= $discount['count_limit'])) {
@@ -47,7 +47,7 @@ class DiscountService implements ServiceInterface
     {
         $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
 
-        if(empty($discount)){
+        if (empty($discount)) {
             return [
                 'result' => false,
                 'data' => new stdClass(),
@@ -84,7 +84,7 @@ class DiscountService implements ServiceInterface
 
     }
 
-    private function canonizeDiscount(object|array $discount)
+    private function canonizeDiscount(object|array $discount): array
     {
         if (empty($discount)) {
             return [];
@@ -123,7 +123,8 @@ class DiscountService implements ServiceInterface
                 'time_expired' => $discount['time_expired']
             ];
         }
-
+        $discount['time_expired_view'] = $discount['time_expired'] > 0 ? $this->utilityService->date($discount['time_expired']) : '';
+        $discount['time_create_view'] = $this->utilityService->date($discount['time_create']);
         return $discount;
     }
 
@@ -131,6 +132,84 @@ class DiscountService implements ServiceInterface
     {
         $discountData['count_used'] = $discountData['count_used'] + 1;
         $this->orderRepository->updateDiscount($discountData);
+    }
+
+    public function getDiscountList(object|array|null $params, mixed $account): array
+    {
+        $limit = $params['limit'] ?? 1000000;
+        $page = $params['page'] ?? 1;
+        $order = $params['order'] ?? ['time_create DESC', 'id DESC'];
+        $offset = ($page - 1) * $limit;
+        $params["order"] = $order;
+        $params["offset"] = $offset;
+        $params["limit"] = $limit;
+        $list = $this->orderRepository->getDiscountList($params);
+        $discountList = [];
+        foreach ($list as $item) {
+            $discountList[] = $this->canonizeDiscount($item);
+        }
+        $count = $this->orderRepository->getDiscountCount($params);
+        return [
+            'result' => true,
+            'data' => [
+                'list' => $discountList,
+                'paginator' => [
+                    'count' => $count,
+                    'limit' => $limit,
+                    'page' => $page,
+                ],
+                'filters' => [],
+            ],
+            'error' => [],
+        ];
+    }
+
+    public function getDiscountAdmin(object|array|null $params, mixed $account): array
+    {
+        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount($params));
+        if (empty($discount)) {
+            return [];
+        }
+        return $discount;
+    }
+
+    public function addDiscount(object|array|null $params, mixed $account): array
+    {
+        $discount = $this->getDiscountAdmin(['code' => $params['code'] ?? ''], $account);
+        if (!empty($discount)) {
+            return [
+                'result' => false,
+                'data' => new stdClass(),
+                'error' => [
+                    'message' => 'This code be generated before!',
+                    'code' => 500
+                ],
+            ];
+        }
+        $params['time_create'] = time();
+        $params['status'] = 1;
+        $result = $this->canonizeDiscount($this->orderRepository->addDiscount($params, $account));
+        return [
+            'result' => true,
+            'data' => $result,
+            'error' => null,
+        ];
+    }
+
+    public function updateDiscount(array $params, mixed $account): array
+    {
+        $listParams['time_update'] = time();
+        $listParams['code'] = $params['code'] ?? '';
+        if (isset($params['count_limit']) && !empty($params['count_limit'])) {
+            $listParams['count_limit'] = $params['count_limit'];
+        }
+        if (isset($params['status']) && !empty($params['status'])) {
+            $listParams['status'] = $params['status'];
+        }
+        if (isset($params['time_expired']) && !empty($params['time_expired'])) {
+            $listParams['time_expired'] = strtotime($params['time_expired']);
+        }
+        return $this->canonizeDiscount($this->orderRepository->updateDiscount($listParams));
     }
 
 

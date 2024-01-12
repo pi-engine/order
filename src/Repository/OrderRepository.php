@@ -381,9 +381,7 @@ class OrderRepository implements OrderRepositoryInterface
     }
 
     /**
-     * @param string $parameter
-     * @param string $type
-     *
+     * @param $params
      * @return object|array
      */
     public function getDiscount($params): object|array
@@ -435,9 +433,85 @@ class OrderRepository implements OrderRepositoryInterface
                 'Database error occurred during update operation'
             );
         }
-        return $this->getDiscount($params);
+        return $this->getDiscount(['code' => $params['code']]);
     }
 
+    /**
+     * @param array $params
+     *
+     * @return HydratingResultSet|array
+     */
+    public function getDiscountList(array $params = []): HydratingResultSet|array
+    {
 
+        $where = [];
+        if (isset($params['status']) && !empty($params['status'])) {
+            $where['status'] = $params['status'];
+        }
+        if (isset($params['id']) && !empty($params['id'])) {
+            $where['id'] = $params['id'];
+        }
+        if (isset($params['data_from']) && !empty($params['data_from'])) {
+            $where['time_create >= ?'] = $params['data_from'];
+        }
+        if (isset($params['data_to']) && !empty($params['data_to'])) {
+            $where['time_create <= ?'] = $params['data_to'];
+        }
 
+        $sql = new Sql($this->db);
+        $select = $sql->select($this->tableOrderDiscount)->where($where)->order($params['order'])->offset($params['offset'])->limit($params['limit']);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface || !$result->isQueryResult()) {
+            return [];
+        }
+
+        $resultSet = new HydratingResultSet($this->hydrator, $this->discountPrototype);
+        $resultSet->initialize($result);
+
+        return $resultSet;
+    }
+
+    public function getDiscountCount(array $params = []): int
+    {
+        $where = [];
+        if (isset($params['status']) && !empty($params['status'])) {
+            $where['status'] = $params['status'];
+        }
+        if (isset($params['id']) && !empty($params['id'])) {
+            $where['id'] = $params['id'];
+        }
+        if (isset($params['data_from']) && !empty($params['data_from'])) {
+            $where['time_create >= ?'] = $params['data_from'];
+        }
+        if (isset($params['data_to']) && !empty($params['data_to'])) {
+            $where['time_create <= ?'] = $params['data_to'];
+        }
+
+        $columns = ['count' => new Expression('count(*)')];
+        $sql = new Sql($this->db);
+        $select = $sql->select($this->tableOrderDiscount)->columns($columns)->where($where);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $row = $statement->execute()->current();
+        return (int)$row['count'];
+    }
+
+    public function addDiscount(array $params): object|array
+    {
+        $insert = new Insert($this->tableOrderDiscount);
+        $insert->values($params);
+
+        $sql = new Sql($this->db);
+        $statement = $sql->prepareStatementForSqlObject($insert);
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface) {
+            throw new RuntimeException(
+                'Database error occurred during blog post insert operation'
+            );
+        }
+        $id = $result->getGeneratedValue();
+        return $this->getDiscount(['id' => $id]);
+    }
 }

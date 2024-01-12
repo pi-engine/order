@@ -43,6 +43,11 @@ return [
             Handler\Admin\Status\StatusListHandler::class => Factory\Handler\Admin\Status\StatusListHandlerFactory::class,
             Handler\Admin\Status\StatusUpdateHandler::class => Factory\Handler\Admin\Status\StatusUpdateHandlerFactory::class,
 
+            Handler\Admin\Discount\DiscountGetHandler::class => Factory\Handler\Admin\Discount\DiscountGetHandlerFactory::class,
+            Handler\Admin\Discount\DiscountListHandler::class => Factory\Handler\Admin\Discount\DiscountListHandlerFactory::class,
+            Handler\Admin\Discount\DiscountUpdateHandler::class => Factory\Handler\Admin\Discount\DiscountUpdateHandlerFactory::class,
+            Handler\Admin\Discount\DiscountAddHandler::class => Factory\Handler\Admin\Discount\DiscountAddHandlerFactory::class,
+
 
         ],
     ],
@@ -411,6 +416,91 @@ return [
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Admin\Status\StatusUpdateHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'discount' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/discount',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'get' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/get',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'admin',
+                                        'package' => 'discount',
+                                        'handler' => 'list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Discount\DiscountGetHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'list' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/list',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'admin',
+                                        'package' => 'discount',
+                                        'handler' => 'list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Discount\DiscountListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'add' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/add',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'admin',
+                                        'package' => 'discount',
+                                        'handler' => 'add',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Discount\DiscountAddHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'update' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/update',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'admin',
+                                        'package' => 'discount',
+                                        'handler' => 'update',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Discount\DiscountUpdateHandler::class
                                         ),
                                     ],
                                 ],

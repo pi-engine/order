@@ -1,6 +1,48 @@
 <?php
 
 return [
+    'admin'   => [
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-discount-update',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'add',
+            'permissions' => 'admin-order-discount-add',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'list',
+            'permissions' => 'admin-order-discount-list',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'status',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-status-update',
+            'role'        => [
+                'admin',
+            ],
+        ],
+    ],
     'api'   => [
         [
             'module'      => 'order',
@@ -136,18 +178,6 @@ return [
             'permission' => 'admin-order-list-get',
             'role'        => [
                 'member',
-                'admin',
-            ],
-        ],
-    ],
-    'admin'   => [
-        [
-            'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'status',
-            'handler'     => 'update',
-            'permissions' => 'admin-order-status-update',
-            'role'        => [
                 'admin',
             ],
         ],
