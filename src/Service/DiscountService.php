@@ -187,7 +187,18 @@ class DiscountService implements ServiceInterface
             ];
         }
         $params['time_create'] = time();
-        $params['status'] = 1;
+        if(!isset($params['status'])){
+            $params['status'] = 0;
+        }
+        if(isset($params['time_expired'])){
+            $params['time_expired'] = strtotime(
+                ($params['time_expired']) != null
+                    ? sprintf('%s', $params['time_expired'])
+                    : sprintf('%s', date('Y-m-d', strtotime('-1 month')))
+            );
+            echo $params['time_expired'];
+        }
+
         $result = $this->canonizeDiscount($this->orderRepository->addDiscount($params, $account));
         return [
             'result' => true,
@@ -203,12 +214,14 @@ class DiscountService implements ServiceInterface
         if (isset($params['count_limit']) && !empty($params['count_limit'])) {
             $listParams['count_limit'] = $params['count_limit'];
         }
-        if (isset($params['status']) && !empty($params['status'])) {
+        if (isset($params['status']) && in_array($params['status'], [0, 1])) {
             $listParams['status'] = $params['status'];
         }
-        if (isset($params['time_expired']) && !empty($params['time_expired'])) {
-            $listParams['time_expired'] = strtotime($params['time_expired']);
+
+        if(isset($params['time_expired'])){
+            $listParams['time_expired'] = strtotime(sprintf('%s', $params['time_expired']));
         }
+
         return $this->canonizeDiscount($this->orderRepository->updateDiscount($listParams));
     }
 
