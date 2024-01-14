@@ -196,7 +196,6 @@ class DiscountService implements ServiceInterface
                     ? sprintf('%s', $params['time_expired'])
                     : sprintf('%s', date('Y-m-d', strtotime('-1 month')))
             );
-            echo $params['time_expired'];
         }
 
         $result = $this->canonizeDiscount($this->orderRepository->addDiscount($params, $account));
