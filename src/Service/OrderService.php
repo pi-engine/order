@@ -4,6 +4,7 @@ namespace Order\Service;
 
 use Content\Service\ItemService;
 use IntlDateFormatter;
+use Notification\Service\NotificationService;
 use Order\Repository\OrderRepositoryInterface;
 use User\Service\AccountService;
 use User\Service\UtilityService;
@@ -19,7 +20,9 @@ class OrderService implements ServiceInterface
     protected AccountService $accountService;
     protected PaymentService $paymentService;
     protected DiscountService $discountService;
+    protected NotificationService $notificationService;
     protected UtilityService $utilityService;
+    protected array $config;
 
     /**
      * @param OrderRepositoryInterface $orderRepository
@@ -30,15 +33,20 @@ class OrderService implements ServiceInterface
         AccountService           $accountService,
         PaymentService           $paymentService,
         DiscountService          $discountService,
-        UtilityService           $utilityService
+        NotificationService      $notificationService,
+        UtilityService           $utilityService,
+                                 $config
+
     )
     {
         $this->orderRepository = $orderRepository;
         $this->contentItemService = $contentItemService;
         $this->accountService = $accountService;
         $this->paymentService = $paymentService;
+        $this->notificationService = $notificationService;
         $this->discountService = $discountService;
         $this->utilityService = $utilityService;
+        $this->config = $config;
     }
 
     /**
@@ -350,11 +358,11 @@ class OrderService implements ServiceInterface
             if (!empty($discountData)) {
                 $discount = $discountData['value'];
                 $gift = $discountData['code'];
-                $this->discountService->useDiscount($discountData,$account);
+                $this->discountService->useDiscount($discountData, $account);
             }
         }
         $params['subtotal'] = $price;
-        $params['total_amount'] = ($price - (($discount*$price)/100));
+        $params['total_amount'] = ($price - (($discount * $price) / 100));
         $params['slug'] = $order['slug'];
         $params['discount'] = $discount;
         $params['gift'] = $gift;
@@ -372,7 +380,6 @@ class OrderService implements ServiceInterface
 
     public function verifyPayment(array $params, mixed $account): array
     {
-
         $order = $this->getOrder(['slug' => $params['slug']], $account);
         if (!sizeof($order)) {
             return [
@@ -424,6 +431,34 @@ class OrderService implements ServiceInterface
                         }
                     }
                 }
+
+                if ($this->config['notices']['admin']['text'] != '') {
+                    $notificationParams = [
+                        'sms' => [
+                            'message' => $this->config['notices']['admin']['text'],
+                            'mobile' => $this->config['notices']['admin']['mobile'],
+                            'source' => '',
+                        ],
+                    ];
+                    $this->notificationService->send($notificationParams);
+                }
+                $client = $this->accountService->getAccount(['id' => $order['user_id']]);
+                if (!empty($client)) {
+                    if (isset($client['mobile'])) {
+                        if ($this->config['notices']['client']['text'] != '') {
+                            $notificationParams = [
+                                'sms' => [
+                                    'message' => $this->config['notices']['client']['text'],
+                                    'mobile' => $client['mobile'],
+                                    'source' => '',
+                                ],
+                            ];
+                            $this->notificationService->send($notificationParams);
+                        }
+                    }
+                }
+
+
             }
 
         }

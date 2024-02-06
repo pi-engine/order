@@ -29,7 +29,6 @@ class PaymentServiceFactory implements FactoryInterface
         $config = $container->get('config');
         return new PaymentService(
             $container->get(OrderRepositoryInterface::class),
-//            $container->get(OrderService::class),
             $container->get(ItemService::class),
             $container->get(AccountService::class),
             $container->get(UtilityService::class),
