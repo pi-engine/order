@@ -43,7 +43,16 @@ class ListHandler implements RequestHandlerInterface
 
 
         // Get list of Orders
-        $result = $this->orderService->getOrderList($requestBody,$account);
+
+        $type = '';
+        if(isset($requestBody['type'])){
+            $type = $requestBody['type'];
+        }
+        if($type=='reserve'){
+            $result = $this->orderService->getReserveOrderList($requestBody,$account);
+        }else{
+            $result = $this->orderService->getOrderList($requestBody,$account);
+        }
 
         return new JsonResponse($result);
     }
