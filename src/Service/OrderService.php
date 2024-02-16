@@ -196,7 +196,7 @@ class OrderService implements ServiceInterface
             'user_id' => $params['user_id'],
             'slug' => $this->orderSlugGenerator($params['user_id'], $params['order_type'], time()),
             'order_type' => $params['order_type'],
-            'information' => json_encode(['order_history' => ['time_create' => time()]]),
+            'information' => json_encode(['order_history' => ['time_create' => time()],'ordered'=>($ordered)]),
             'time_create' => time()
         ];
         $order = $this->orderRepository->addOrder($orderParams);
