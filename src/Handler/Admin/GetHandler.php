@@ -42,7 +42,7 @@ class GetHandler implements RequestHandlerInterface
         $requestBody = $request->getParsedBody();
 
         // Set record params
-        $requestBody['user_id'] = $account['id'];
+        //$requestBody['user_id'] = $account['id'];
         // Get list of Orders
         $result = $this->orderService->getOrder($requestBody, $account);
         // Set the response data
