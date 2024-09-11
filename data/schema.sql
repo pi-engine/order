@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table order_discount
+-- Table structure for table order_coupon
 --
 
-CREATE TABLE order_discount (
+CREATE TABLE order_coupon (
                                 id int NOT NULL,
                                 code varchar(255) COLLATE utf8mb4_bin NOT NULL,
                                 type varchar(255) COLLATE utf8mb4_bin DEFAULT 'percent',
@@ -58,6 +58,7 @@ CREATE TABLE order_item (
                             unit_price int DEFAULT NULL,
                             tax int DEFAULT NULL,
                             discount int DEFAULT NULL,
+                            coupon_id int DEFAULT NULL,
                             gift int DEFAULT NULL,
                             price int DEFAULT NULL,
                             status int NOT NULL DEFAULT '1',
@@ -82,6 +83,7 @@ CREATE TABLE order_order (
                              subtotal int DEFAULT NULL,
                              tax int DEFAULT NULL,
                              discount int DEFAULT NULL,
+                             coupon_id int DEFAULT NULL,
                              gift varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
                              total_amount int DEFAULT NULL,
                              payment_method varchar(255) COLLATE utf8mb4_bin DEFAULT 'cache',
@@ -97,9 +99,9 @@ CREATE TABLE order_order (
 --
 
 --
--- Indexes for table order_discount
+-- Indexes for table order_coupon
 --
-ALTER TABLE order_discount
+ALTER TABLE order_coupon
     ADD PRIMARY KEY (id),
   ADD UNIQUE KEY code (code);
 
@@ -120,9 +122,9 @@ ALTER TABLE order_order
 --
 
 --
--- AUTO_INCREMENT for table order_discount
+-- AUTO_INCREMENT for table order_coupon
 --
-ALTER TABLE order_discount
+ALTER TABLE order_coupon
     MODIFY id int NOT NULL AUTO_INCREMENT;
 
 --
