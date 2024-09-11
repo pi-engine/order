@@ -19,24 +19,24 @@ class CouponUpdateHandler implements RequestHandlerInterface
     protected StreamFactoryInterface $streamFactory;
 
     /** @var CouponService */
-    protected CouponService $discountService;
+    protected CouponService $couponService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
-        CouponService $discountService
+        CouponService $couponService
     ) {
         $this->responseFactory     = $responseFactory;
         $this->streamFactory       = $streamFactory;
-        $this->discountService = $discountService;
+        $this->couponService = $couponService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $account = $request->getAttribute('account');
         $requestBody = $request->getParsedBody();
-        $result = $this->discountService->updateCoupon($requestBody,$account);
+        $result = $this->couponService->updateCoupon($requestBody,$account);
         $responseBody = [
             'result' => true,
             'data' => $result,

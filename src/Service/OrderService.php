@@ -6,6 +6,8 @@ use Content\Service\ItemService;
 use IntlDateFormatter;
 use Notification\Service\NotificationService;
 use Order\Repository\OrderRepositoryInterface;
+use Product\Service\CartService;
+use stdClass;
 use User\Service\AccountService;
 use User\Service\UtilityService;
 use function var_dump;
@@ -19,22 +21,40 @@ class OrderService implements ServiceInterface
 
     protected AccountService $accountService;
     protected PaymentService $paymentService;
-    protected CouponService $discountService;
+    protected CouponService $couponService;
+
     protected NotificationService $notificationService;
+
     protected UtilityService $utilityService;
+
+    protected CartService $cartService;
+
+    protected AddressService $addressService;
+
     protected array $config;
 
     /**
      * @param OrderRepositoryInterface $orderRepository
+     * @param ItemService $contentItemService
+     * @param AccountService $accountService
+     * @param PaymentService $paymentService
+     * @param CouponService $couponService
+     * @param NotificationService $notificationService
+     * @param UtilityService $utilityService
+     * @param CartService $cartService
+     * @param AddressService $addressService
+     * @param $config
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         ItemService              $contentItemService,
         AccountService           $accountService,
         PaymentService           $paymentService,
-        CouponService          $discountService,
+        CouponService          $couponService,
         NotificationService      $notificationService,
         UtilityService           $utilityService,
+        CartService              $cartService,
+        AddressService            $addressService,
                                  $config
 
     )
@@ -44,15 +64,17 @@ class OrderService implements ServiceInterface
         $this->accountService = $accountService;
         $this->paymentService = $paymentService;
         $this->notificationService = $notificationService;
-        $this->discountService = $discountService;
+        $this->couponService = $couponService;
+        $this->cartService = $cartService;
         $this->utilityService = $utilityService;
+        $this->addressService = $addressService;
         $this->config = $config;
     }
 
     /**
      * @param $params
-     *
-     * @return array
+     * @param $account
+     * @return array|null
      */
     public function getOrderList($params, $account): array|null
     {
@@ -136,8 +158,8 @@ class OrderService implements ServiceInterface
 
     /**
      * @param $params
-     *
-     * @return array
+     * @param $account
+     * @return array|null
      */
     public function getReserveOrderList($params, $account): array|null
     {
@@ -173,9 +195,8 @@ class OrderService implements ServiceInterface
 
 
     /**
-     * @param string $parameter
-     * @param string $type
-     *
+     * @param $params
+     * @param $account
      * @return array
      */
     public function getOrder($params, $account): array
@@ -251,60 +272,6 @@ class OrderService implements ServiceInterface
         return sprintf('user_%d_%s_%d', $user_id, strtolower(str_replace(' ', '_', $type)), $timestamp);
     }
 
-    public function canonizeOrder($order): array
-    {
-        if (empty($order)) {
-            return [];
-        }
-
-        if (is_object($order)) {
-            $order = [
-                'id' => (int)$order->getId(),
-                'slug' => $order->getSlug(),
-                'user_id' => $order->getUserId(),
-                'user' => $this->accountService->getProfile(['user_id' => $order->getUserId()]),
-                'entity_type' => $order->getEntityType(),
-                'order_type' => $order->getOrderType(),
-                'status' => $order->getStatus(),
-                'subtotal' => $order->getSubtotal(),
-                'tax' => $order->getTax(),
-                'discount' => $order->getCoupon(),
-                'gift' => $order->getGift(),
-                'payment_method' => $order->getPaymentMethod(),
-                'payment' => $order->getPayment(),
-                'time_create' => $order->getTimeCreate(),
-                'total_amount' => $order->getTotalAmount(),
-                'information' => $order->getInformation(),
-            ];
-        } else {
-            $order = [
-                'id' => (int)$order['id'],
-                'slug' => $order['slug'],
-                'user_id' => (int)$order['user_id'],
-                'user' => $this->accountService->getProfile(['user_id' => $order['user']]),
-                'entity_type' => $order['entity_type'],
-                'order_type' => $order['order_type'],
-                'status' => $order['status'],
-                'subtotal' => $order['subtotal'],
-                'tax' => $order['tax'],
-                'discount' => $order['discount'],
-                'gift' => $order['gift'],
-                'payment_method' => $order['payment_method'],
-                'payment' => $order['payment'],
-                'time_create' => $order['time_create'],
-                'total_amount' => $order['total_amount'],
-                'information' => $order['information'],
-            ];
-        }
-
-        $order['information'] = (!empty($order['information'])) ? json_decode($order['information'], true) : [];
-        $order['payment'] = (!empty($order['payment'])) ? json_decode($order['payment'], true) : [];
-        $order["time_create_view"] = $this->utilityService->date($order['time_create']);
-        $order["total_amount_view"] = $order['total_amount'] . ' تومان';
-
-        return ($order);
-    }
-
     public function createPhysicalOrder(object|array $requestBody, mixed $account): array
     {
 
@@ -318,62 +285,65 @@ class OrderService implements ServiceInterface
             'payment_method' => $requestBody['payment_method'] ?? 'online',
             'time_create' => time(),
         ];
-        ///TODO:remove garbage params
+
         $requestBody['user_id'] = $account['id'];
         $requestBody['order_type'] = 'physical';
         $requestBody['entity_type'] = $requestBody['entity_type'] ?? 'product';
         $requestBody['payment_method'] = $requestBody['payment_method'] ?? 'online';
         $requestBody['time_create'] = time();
 
-        $cart = $this->contentItemService->getCart(['slug' => 'cart-' . $account['id']]);
+        //get cart information
+        $cart =$this->cartService->getCart($account);
 
-        $forbiddenList = [];
-
-        foreach ($cart as $product) {
-            $originalProduct = $this->contentItemService->getItem($product['slug'], 'slug');
-            if ((int)$product['count'] > (int)$this->getStockCount($originalProduct))
-                $forbiddenList[] = $originalProduct;
-        }
-        if (!empty($forbiddenList)) {
-            return [
-                'result' => false,
-                'data' =>
-                    [
-                        'list' => $forbiddenList,
-                    ],
-                'error' => [],
-            ];
-        }
-
-
-        $order = $this->contentItemService->addOrderItem($requestBody, $account);
-        $price = 0;
-        if (!sizeof($order)) {
-            return [];
-        }
-        $products = $order['items'];
-        foreach ($products as $product) {
-            $price += ($this->getPrice($product) * $product['count']);
-        }
-
-        if (isset($requestBody['discount_code'])) {
-            $discountData = $this->discountService->getCoupon(['code' => $requestBody['discount_code']], $account);
+        //get coupon information
+        $discountData = [];
+        if (isset($requestBody['coupon'])) {
+            $discountData = $this->couponService->getCoupon(['code' => $requestBody['coupon']], $account);
             if (!empty($discountData)) {
                 $discount = $discountData['value'];
                 $gift = $discountData['code'];
-                $this->discountService->useCoupon($discountData, $account);
+                unset($discountData['time_create_view']);
+                unset($discountData['time_expired_view']);
+                $this->couponService->useCoupon($discountData, $account);
             }
         }
+
+        //get address information
+        $address= [];
+        if (isset($requestBody['address'])) {
+            if(isset($requestBody['address']['id'])&&$requestBody['address']['id']!==null){
+                $address = $requestBody['address'];
+            }else{
+                $address = $this->addressService->addAddress($requestBody['address'], $account);
+            }
+        }
+
+        $price =(int)$cart['cart']['payable_price'];
         $params['subtotal'] = $price;
         $params['total_amount'] = ($price - (($discount * $price) / 100));
-        $params['slug'] = $order['slug'];
+        $params['slug'] = $this->orderSlugGenerator($cart['user_id'],'physical',time());
         $params['discount'] = $discount;
+        $params['coupon_id'] = empty($discountData)?null:$discountData['id'];
         $params['gift'] = $gift;
 
         $json = $params;
-        $json['cart'] = $order;
+
+        //unset old params of price in cart and show only order price
+        unset($cart['cart']['total_price']);
+        unset($cart['cart']['payable_price']);
+
+        $json['cart'] = $cart['cart'];
+        $json['coupon'] = $discountData;
+        $json['address'] = $address;
+
+        //data as time delivery and extra info
+        $json['delivery_information'] = isset($requestBody['delivery_information']) ? $requestBody['delivery_information'] : [];
         $params['information'] = json_encode($json, JSON_UNESCAPED_UNICODE);
         $result = $this->canonizeOrder($this->orderRepository->addOrder($params));
+
+        if($result){
+            $this->cartService->clearCart($account);
+        }
         return [
             'result' => true,
             'data' => $result,
@@ -739,5 +709,61 @@ class OrderService implements ServiceInterface
         $params['data_from'] = explode(' ', $this->utilityService->date(strtotime('-30 days')))[0];
         $params['data_to'] = explode(' ', $this->utilityService->date(time()))[0];
         return $params;
+    }
+
+    public function canonizeOrder($order): array
+    {
+        if (empty($order)) {
+            return [];
+        }
+
+        if (is_object($order)) {
+            $order = [
+                'id' => (int)$order->getId(),
+                'slug' => $order->getSlug(),
+                'user_id' => $order->getUserId(),
+                'user' => $this->accountService->getProfile(['user_id' => $order->getUserId()]),
+                'entity_type' => $order->getEntityType(),
+                'order_type' => $order->getOrderType(),
+                'status' => $order->getStatus(),
+                'subtotal' => $order->getSubtotal(),
+                'tax' => $order->getTax(),
+                'discount' => $order->getDiscount(),
+                'coupon_id' => $order->getCouponId(),
+                'gift' => $order->getGift(),
+                'payment_method' => $order->getPaymentMethod(),
+                'payment' => $order->getPayment(),
+                'time_create' => $order->getTimeCreate(),
+                'total_amount' => $order->getTotalAmount(),
+                'information' => $order->getInformation(),
+            ];
+        } else {
+            $order = [
+                'id' => (int)$order['id'],
+                'slug' => $order['slug'],
+                'user_id' => (int)$order['user_id'],
+                'user' => $this->accountService->getProfile(['user_id' => $order['user']]),
+                'entity_type' => $order['entity_type'],
+                'order_type' => $order['order_type'],
+                'status' => $order['status'],
+                'subtotal' => $order['subtotal'],
+                'tax' => $order['tax'],
+                'discount' => $order['discount'],
+                'coupon_id' => $order['coupon_id'],
+                'gift' => $order['gift'],
+                'payment_method' => $order['payment_method'],
+                'payment' => $order['payment'],
+                'time_create' => $order['time_create'],
+                'total_amount' => $order['total_amount'],
+                'information' => $order['information'],
+            ];
+        }
+
+        $order['information'] = (!empty($order['information'])) ? json_decode($order['information'], true) : [];
+        $order['payment'] = (!empty($order['payment'])) ? json_decode($order['payment'], true) : [];
+        $order["time_create_view"] = $this->utilityService->date($order['time_create']);
+        $order["total_amount_view"] = $order['total_amount']  ;
+
+        return ($order);
     }
 }

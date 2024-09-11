@@ -5,7 +5,7 @@ namespace Order\Factory\Service;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Order\Repository\OrderRepositoryInterface;
-use Order\Service\DiscountService;
+use Order\Service\CouponService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use User\Service\AccountService;
@@ -18,13 +18,13 @@ class CouponServiceFactory implements FactoryInterface
      * @param string             $requestedName
      * @param null|array         $options
      *
-     * @return DiscountService
+     * @return CouponService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): DiscountService
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): CouponService
     {
-        return new DiscountService(
+        return new CouponService(
             $container->get(OrderRepositoryInterface::class),
             $container->get(AccountService::class),
             $container->get(UtilityService::class)

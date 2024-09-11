@@ -20,18 +20,18 @@ class CouponVerifyHandler implements RequestHandlerInterface
     protected StreamFactoryInterface $streamFactory;
 
     /** @var CouponService */
-    protected CouponService $discountService;
+    protected CouponService $couponService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        CouponService          $discountService
+        CouponService          $couponService
     )
     {
         $this->responseFactory  = $responseFactory;
         $this->streamFactory    = $streamFactory;
-        $this->discountService  = $discountService;
+        $this->couponService  = $couponService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -42,7 +42,7 @@ class CouponVerifyHandler implements RequestHandlerInterface
             'code' => $requestBody['code'] ?? '',
             'status' => 1,
         ];
-        $result = $this->discountService->verifyCode($params,$account);
+        $result = $this->couponService->verifyCode($params,$account);
         return new JsonResponse($result);
     }
 }

@@ -1,49 +1,40 @@
 <?php
 
 return [
-    'admin'   => [
-        [
-            'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'discount',
-            'handler'     => 'update',
-            'permissions' => 'admin-order-discount-update',
-            'role'        => [
-                'admin',
-            ],
-        ],
-        [
-            'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'discount',
-            'handler'     => 'add',
-            'permissions' => 'admin-order-discount-add',
-            'role'        => [
-                'admin',
-            ],
-        ],
-        [
-            'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'discount',
-            'handler'     => 'list',
-            'permissions' => 'admin-order-discount-list',
-            'role'        => [
-                'admin',
-            ],
-        ],
-        [
-            'module'      => 'order',
-            'section'     => 'admin',
-            'package'     => 'status',
-            'handler'     => 'update',
-            'permissions' => 'admin-order-status-update',
-            'role'        => [
-                'admin',
-            ],
-        ],
-    ],
     'api'   => [
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'coupon',
+            'handler'     => 'verify',
+            'permissions' => 'api-order-coupon-verify',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'address',
+            'handler'     => 'list',
+            'permissions' => 'api-order-address-list',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'api',
+            'package'     => 'address',
+            'handler'     => 'add',
+            'permissions' => 'api-order-address-add',
+            'role'        => [
+                'member',
+                'admin',
+            ],
+        ],
         [
             'module'      => 'order',
             'section'     => 'api',
@@ -55,7 +46,6 @@ return [
                 'admin',
             ],
         ],
-
         [
             'module'      => 'order',
             'section'     => 'api',
@@ -178,6 +168,48 @@ return [
             'permission' => 'admin-order-list-get',
             'role'        => [
                 'member',
+                'admin',
+            ],
+        ],
+    ],
+    'admin'   => [
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-discount-update',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'add',
+            'permissions' => 'admin-order-discount-add',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'discount',
+            'handler'     => 'list',
+            'permissions' => 'admin-order-discount-list',
+            'role'        => [
+                'admin',
+            ],
+        ],
+        [
+            'module'      => 'order',
+            'section'     => 'admin',
+            'package'     => 'status',
+            'handler'     => 'update',
+            'permissions' => 'admin-order-status-update',
+            'role'        => [
                 'admin',
             ],
         ],

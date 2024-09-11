@@ -4,8 +4,10 @@ namespace Order;
 
 use Laminas\Mvc\Middleware\PipeSpec;
 use Laminas\Router\Http\Literal;
+use Product\Middleware\CartMiddleware;
 use User\Middleware\AuthenticationMiddleware;
 use User\Middleware\AuthorizationMiddleware;
+use User\Middleware\RequestPreparationMiddleware;
 use User\Middleware\SecurityMiddleware;
 
 return [
@@ -18,6 +20,7 @@ return [
 
             Repository\OrderRepository::class => Factory\Repository\OrderRepositoryFactory::class,
             Service\OrderService::class => Factory\Service\OrderServiceFactory::class,
+            Service\AddressService::class => Factory\Service\AddressServiceFactory::class,
             Service\PaymentService::class => Factory\Service\PaymentServiceFactory::class,
             Service\CouponService::class => Factory\Service\CouponSErviceFactory::class,
 
@@ -34,6 +37,10 @@ return [
             Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
 
             Handler\Api\Coupon\CouponVerifyHandler::class => Factory\Handler\Api\Coupon\CouponVerifyHandlerFactory::class,
+ 
+            Handler\Api\Address\AddressAddHandler::class => Factory\Handler\Api\Address\AddressAddHandlerFactory::class,
+            Handler\Api\Address\AddressListHandler::class => Factory\Handler\Api\Address\AddressListHandlerFactory::class,
+
 
             ///ADMIN
             Handler\Admin\DashboardHandler::class => Factory\Handler\Admin\DashboardHandlerFactory::class,
@@ -61,6 +68,55 @@ return [
                     'defaults' => [],
                 ],
                 'child_routes' => [
+                    'address' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/address',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'create' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/add',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'address',
+                                        'handler' => 'add',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Address\AddressAddHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'list' => [
+                                'type' => Literal::class,
+                                'options' => [
+                                    'route' => '/list',
+                                    'defaults' => [
+                                        'module' => 'order',
+                                        'section' => 'api',
+                                        'package' => 'address',
+                                        'handler' => 'list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Api\Address\AddressListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'reserve' => [
                         'type' => Literal::class,
                         'options' => [
@@ -79,8 +135,8 @@ return [
                                         'handler' => 'create',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
-                                            ///TODO:resolve it when user send json for information
-//                                            SecurityMiddleware::class,
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Api\Reserve\CreateHandler::class
@@ -124,12 +180,14 @@ return [
                                         'section' => 'api',
                                         'package' => 'physical',
                                         'handler' => 'create',
+                                        'validator'=> 'physical_order',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
-                                            ///TODO:resolve it when user send json for information
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
+                                            CartMiddleware::class,
                                             Handler\Api\Physical\CreateHandler::class
                                         ),
                                     ],
@@ -146,6 +204,7 @@ return [
                                         'handler' => 'list',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -165,6 +224,7 @@ return [
                                         'handler' => 'get',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -212,6 +272,7 @@ return [
                                         'handler' => 'list',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -231,6 +292,7 @@ return [
                                         'handler' => 'get',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -250,9 +312,10 @@ return [
                                         'handler' => 'verify',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
-//                                            AuthenticationMiddleware::class,
-//                                            AuthorizationMiddleware::class,
+                                            //AuthenticationMiddleware::class,
+                                            //AuthorizationMiddleware::class,
                                             Handler\Api\Payment\VerifyHandler::class
                                         ),
                                     ],
@@ -260,10 +323,10 @@ return [
                             ],
                         ],
                     ],
-                    'discount' => [
+                    'coupon' => [
                         'type' => Literal::class,
                         'options' => [
-                            'route' => '/discount',
+                            'route' => '/coupon',
                             'defaults' => [],
                         ],
                         'child_routes' => [
@@ -274,10 +337,11 @@ return [
                                     'defaults' => [
                                         'module' => 'order',
                                         'section' => 'api',
-                                        'package' => 'discount',
+                                        'package' => 'coupon',
                                         'handler' => 'verify',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -422,10 +486,10 @@ return [
                             ],
                         ],
                     ],
-                    'discount' => [
+                    'coupon' => [
                         'type' => Literal::class,
                         'options' => [
-                            'route' => '/discount',
+                            'route' => '/coupon',
                             'defaults' => [],
                         ],
                         'child_routes' => [
@@ -436,7 +500,7 @@ return [
                                     'defaults' => [
                                         'module' => 'order',
                                         'section' => 'admin',
-                                        'package' => 'discount',
+                                        'package' => 'coupon',
                                         'handler' => 'list',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
@@ -455,7 +519,7 @@ return [
                                     'defaults' => [
                                         'module' => 'order',
                                         'section' => 'admin',
-                                        'package' => 'discount',
+                                        'package' => 'coupon',
                                         'handler' => 'list',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
@@ -474,7 +538,7 @@ return [
                                     'defaults' => [
                                         'module' => 'order',
                                         'section' => 'admin',
-                                        'package' => 'discount',
+                                        'package' => 'coupon',
                                         'handler' => 'add',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
@@ -493,7 +557,7 @@ return [
                                     'defaults' => [
                                         'module' => 'order',
                                         'section' => 'admin',
-                                        'package' => 'discount',
+                                        'package' => 'coupon',
                                         'handler' => 'update',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
@@ -520,7 +584,7 @@ return [
                                 'controller' => PipeSpec::class,
                                 'middleware' => new PipeSpec(
                                     SecurityMiddleware::class,
-                                    AuthenticationMiddleware::class,
+                                    //AuthenticationMiddleware::class,
                                     Handler\InstallerHandler::class
                                 ),
                             ],

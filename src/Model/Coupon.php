@@ -1,7 +1,7 @@
 <?php
 
 namespace Order\Model;
-class Discount
+class Coupon
 {
     private mixed $id;
     private mixed $code;

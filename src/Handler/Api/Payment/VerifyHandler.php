@@ -37,7 +37,7 @@ class VerifyHandler implements RequestHandlerInterface
         $requestBody = $request->getParsedBody();
         $params = [
             'authority'    => $requestBody['authority'] ?? 1,
-            'slug'   => $requestBody['slug'] ?? 100,
+            'slug'   => $requestBody['slug'] ?? '',
         ];
         $result = $this->orderService->verifyPayment($params,[]);
         return new JsonResponse($result);

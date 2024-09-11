@@ -15,6 +15,7 @@ class OrderItem
     private ?int $unit_price;
     private ?int $tax;
     private ?int $discount;
+    private ?int $coupon_id;
     private ?int $gift;
     private ?int $price;
     private int $status;
@@ -23,25 +24,28 @@ class OrderItem
     private int $time_update;
     private int $time_delete;
 
-    public function __construct(
-        int $id,
-        int $user_id,
-        int $order_id,
-        ?string $ordered_slug = null,
-        ?string $ordered_type = null,
-        ?int $ordered_id = null,
-        ?int $quantity = null,
-        ?int $unit_price = null,
-        ?int $tax = null,
-        ?int $discount = null,
-        ?int $gift = null,
-        ?int $price = null,
-        int $status = 1,
-        ?string $information = null,
-        int $time_create = 0,
-        int $time_update = 0,
-        int $time_delete = 0
-    ) {
+    /**
+     * @param int $id
+     * @param int $user_id
+     * @param int $order_id
+     * @param string|null $ordered_slug
+     * @param string|null $ordered_type
+     * @param int|null $ordered_id
+     * @param int|null $quantity
+     * @param int|null $unit_price
+     * @param int|null $tax
+     * @param int|null $discount
+     * @param int|null $coupon_id
+     * @param int|null $gift
+     * @param int|null $price
+     * @param int $status
+     * @param string|null $information
+     * @param int $time_create
+     * @param int $time_update
+     * @param int $time_delete
+     */
+    public function __construct(int $id, int $user_id, int $order_id, ?string $ordered_slug, ?string $ordered_type, ?int $ordered_id, ?int $quantity, ?int $unit_price, ?int $tax, ?int $discount, ?int $coupon_id, ?int $gift, ?int $price, int $status, ?string $information, int $time_create, int $time_update, int $time_delete)
+    {
         $this->id = $id;
         $this->user_id = $user_id;
         $this->order_id = $order_id;
@@ -52,6 +56,7 @@ class OrderItem
         $this->unit_price = $unit_price;
         $this->tax = $tax;
         $this->discount = $discount;
+        $this->coupon_id = $coupon_id;
         $this->gift = $gift;
         $this->price = $price;
         $this->status = $status;
@@ -71,6 +76,16 @@ class OrderItem
         $this->id = $id;
     }
 
+    public function getUserId(): int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): void
+    {
+        $this->user_id = $user_id;
+    }
+
     public function getOrderId(): int
     {
         return $this->order_id;
@@ -79,16 +94,6 @@ class OrderItem
     public function setOrderId(int $order_id): void
     {
         $this->order_id = $order_id;
-    }
-
-    public function getOrderedId(): ?int
-    {
-        return $this->ordered_id;
-    }
-
-    public function setOrderedId(?int $ordered_id): void
-    {
-        $this->ordered_id = $ordered_id;
     }
 
     public function getOrderedSlug(): ?string
@@ -109,6 +114,16 @@ class OrderItem
     public function setOrderedType(?string $ordered_type): void
     {
         $this->ordered_type = $ordered_type;
+    }
+
+    public function getOrderedId(): ?int
+    {
+        return $this->ordered_id;
+    }
+
+    public function setOrderedId(?int $ordered_id): void
+    {
+        $this->ordered_id = $ordered_id;
     }
 
     public function getQuantity(): ?int
@@ -151,7 +166,17 @@ class OrderItem
         $this->discount = $discount;
     }
 
-    public function getGift(): mixed
+    public function getCouponId(): ?int
+    {
+        return $this->coupon_id;
+    }
+
+    public function setCouponId(?int $coupon_id): void
+    {
+        $this->coupon_id = $coupon_id;
+    }
+
+    public function getGift(): ?int
     {
         return $this->gift;
     }
@@ -181,12 +206,12 @@ class OrderItem
         $this->status = $status;
     }
 
-    public function getInformation(): ?array
+    public function getInformation(): ?string
     {
         return $this->information;
     }
 
-    public function setInformation(?array $information): void
+    public function setInformation(?string $information): void
     {
         $this->information = $information;
     }
@@ -221,13 +246,7 @@ class OrderItem
         $this->time_delete = $time_delete;
     }
 
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
 
-    public function setUserId(int $user_id): void
-    {
-        $this->user_id = $user_id;
-    }
+
+
 }

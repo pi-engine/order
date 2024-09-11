@@ -1,16 +1,16 @@
 <?php
 
-namespace Order\Handler\Admin\Coupon;
+namespace Order\Handler\Api\Address;
 
+use Order\Service\AddressService;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Order\Service\CouponService;
 
-class CouponAddHandler implements RequestHandlerInterface
+class AddressAddHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -18,25 +18,30 @@ class CouponAddHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var CouponService */
-    protected CouponService $couponService;
+    /** @var AddressService */
+    protected AddressService $addressService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
-        CouponService $couponService
+        AddressService $addressService
     ) {
-        $this->responseFactory     = $responseFactory;
-        $this->streamFactory       = $streamFactory;
-        $this->couponService = $couponService;
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory   = $streamFactory;
+        $this->addressService     = $addressService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
-    {
+    { 
         $account = $request->getAttribute('account');
-        $requestBody = $request->getParsedBody();
-        $result = $this->couponService->addCoupon($requestBody,$account);
+        $requestBody["user_id"] =  $account['id']; 
+        $result = $this->addressService->addAddress($requestBody,$account);
+        $result = [
+            'result' => true,
+            'data'   => $result,
+            'error'  => [],
+        ]; 
         return new JsonResponse($result);
     }
 }

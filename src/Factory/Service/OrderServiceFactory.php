@@ -6,8 +6,10 @@ use Content\Service\ItemService;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Notification\Service\NotificationService;
-use Order\Service\DiscountService;
+use Order\Service\AddressService;
+use Order\Service\CouponService;
 use Order\Service\PaymentService;
+use Product\Service\CartService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Order\Repository\OrderRepositoryInterface;
@@ -34,9 +36,11 @@ class OrderServiceFactory implements FactoryInterface
             $container->get(ItemService::class),
             $container->get(AccountService::class),
             $container->get(PaymentService::class),
-            $container->get(DiscountService::class),
+            $container->get(CouponService::class),
             $container->get(NotificationService::class),
             $container->get(UtilityService::class),
+            $container->get(CartService::class),
+            $container->get(AddressService::class),
             $config['payment']
         );
     }
