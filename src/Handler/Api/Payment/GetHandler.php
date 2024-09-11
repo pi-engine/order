@@ -3,7 +3,6 @@
 namespace Order\Handler\Api\Payment;
 
 use Laminas\Diactoros\Response\JsonResponse;
-use Order\Service\PaymentService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,7 +19,7 @@ class GetHandler implements RequestHandlerInterface
     protected StreamFactoryInterface $streamFactory;
 
     /** @var OrderService */
-    protected OrderService $paymentService;
+    protected OrderService $orderService;
 
 
     public function __construct(
@@ -39,7 +38,6 @@ class GetHandler implements RequestHandlerInterface
         $account = $request->getAttribute('account');
         $requestBody = $request->getParsedBody();
         $result = $this->orderService->createLink($requestBody, $account);
-
         return new JsonResponse($result);
     }
 }

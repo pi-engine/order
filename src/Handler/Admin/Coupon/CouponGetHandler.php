@@ -1,6 +1,6 @@
 <?php
 
-namespace Order\Handler\Admin\Discount;
+namespace Order\Handler\Admin\Coupon;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -8,9 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Order\Service\DiscountService;
+use Order\Service\CouponService;
 
-class DiscountListHandler implements RequestHandlerInterface
+class CouponGetHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -18,14 +18,14 @@ class DiscountListHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var DiscountService */
-    protected DiscountService $discountService;
+    /** @var CouponService */
+    protected CouponService $discountService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        DiscountService             $discountService
+        CouponService             $discountService
     )
     {
         $this->responseFactory = $responseFactory;
@@ -40,7 +40,12 @@ class DiscountListHandler implements RequestHandlerInterface
 
         // Get request body
         $requestBody = $request->getParsedBody();
-        $discountList = $this->discountService->getDiscountList($requestBody,$account);
-        return new JsonResponse($discountList);
+        $discount = $this->discountService->getCouponAdmin($requestBody,$account);
+        $discount = [
+            'result' => true,
+            'data' => $discount,
+            'error' => null,
+        ];
+        return new JsonResponse($discount);
     }
 }

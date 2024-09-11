@@ -19,7 +19,7 @@ return [
             Repository\OrderRepository::class => Factory\Repository\OrderRepositoryFactory::class,
             Service\OrderService::class => Factory\Service\OrderServiceFactory::class,
             Service\PaymentService::class => Factory\Service\PaymentServiceFactory::class,
-            Service\DiscountService::class => Factory\Service\DiscountSErviceFactory::class,
+            Service\CouponService::class => Factory\Service\CouponSErviceFactory::class,
 
             Handler\Api\Reserve\CreateHandler::class => Factory\Handler\Api\Reserve\CreateHandlerFactory::class,
             Handler\Api\Reserve\ListHandler::class => Factory\Handler\Api\Reserve\ListHandlerFactory::class,
@@ -33,7 +33,7 @@ return [
             Handler\Api\Payment\ListHandler::class => Factory\Handler\Api\Payment\ListHandlerFactory::class,
             Handler\Api\Payment\VerifyHandler::class => Factory\Handler\Api\Payment\VerifyHandlerFactory::class,
 
-            Handler\Api\Discount\DiscountVerifyHandler::class => Factory\Handler\Api\Discount\DiscountVerifyHandlerFactory::class,
+            Handler\Api\Coupon\CouponVerifyHandler::class => Factory\Handler\Api\Coupon\CouponVerifyHandlerFactory::class,
 
             ///ADMIN
             Handler\Admin\DashboardHandler::class => Factory\Handler\Admin\DashboardHandlerFactory::class,
@@ -43,10 +43,10 @@ return [
             Handler\Admin\Status\StatusListHandler::class => Factory\Handler\Admin\Status\StatusListHandlerFactory::class,
             Handler\Admin\Status\StatusUpdateHandler::class => Factory\Handler\Admin\Status\StatusUpdateHandlerFactory::class,
 
-            Handler\Admin\Discount\DiscountGetHandler::class => Factory\Handler\Admin\Discount\DiscountGetHandlerFactory::class,
-            Handler\Admin\Discount\DiscountListHandler::class => Factory\Handler\Admin\Discount\DiscountListHandlerFactory::class,
-            Handler\Admin\Discount\DiscountUpdateHandler::class => Factory\Handler\Admin\Discount\DiscountUpdateHandlerFactory::class,
-            Handler\Admin\Discount\DiscountAddHandler::class => Factory\Handler\Admin\Discount\DiscountAddHandlerFactory::class,
+            Handler\Admin\Coupon\CouponGetHandler::class => Factory\Handler\Admin\Coupon\couponGetHandlerFactory::class,
+            Handler\Admin\Coupon\CouponListHandler::class => Factory\Handler\Admin\Coupon\CouponListHandlerFactory::class,
+            Handler\Admin\Coupon\CouponUpdateHandler::class => Factory\Handler\Admin\Coupon\CouponUpdateHandlerFactory::class,
+            Handler\Admin\Coupon\CouponAddHandler::class => Factory\Handler\Admin\Coupon\CouponAddHandlerFactory::class,
 
 
         ],
@@ -281,7 +281,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Api\Discount\DiscountVerifyHandler::class
+                                            Handler\Api\Coupon\CouponVerifyHandler::class
                                         ),
                                     ],
                                 ],
@@ -443,7 +443,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Admin\Discount\DiscountGetHandler::class
+                                            Handler\Admin\Coupon\CouponGetHandler::class
                                         ),
                                     ],
                                 ],
@@ -462,7 +462,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Admin\Discount\DiscountListHandler::class
+                                            Handler\Admin\Coupon\CouponListHandler::class
                                         ),
                                     ],
                                 ],
@@ -481,7 +481,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Admin\Discount\DiscountAddHandler::class
+                                            Handler\Admin\Coupon\CouponAddHandler::class
                                         ),
                                     ],
                                 ],
@@ -500,7 +500,7 @@ return [
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
-                                            Handler\Admin\Discount\DiscountUpdateHandler::class
+                                            Handler\Admin\Coupon\CouponUpdateHandler::class
                                         ),
                                     ],
                                 ],

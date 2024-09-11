@@ -1,6 +1,6 @@
 <?php
 
-namespace Order\Handler\Admin\Discount;
+namespace Order\Handler\Admin\Coupon;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -8,9 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Order\Service\DiscountService;
+use Order\Service\CouponService;
 
-class DiscountUpdateHandler implements RequestHandlerInterface
+class CouponUpdateHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -18,14 +18,14 @@ class DiscountUpdateHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var DiscountService */
-    protected DiscountService $discountService;
+    /** @var CouponService */
+    protected CouponService $discountService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
-        DiscountService $discountService
+        CouponService $discountService
     ) {
         $this->responseFactory     = $responseFactory;
         $this->streamFactory       = $streamFactory;
@@ -34,14 +34,9 @@ class DiscountUpdateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get account
         $account = $request->getAttribute('account');
-
-        // Get request body
         $requestBody = $request->getParsedBody();
-
-        // Get list of Orders
-        $result = $this->discountService->updateDiscount($requestBody,$account);
+        $result = $this->discountService->updateCoupon($requestBody,$account);
         $responseBody = [
             'result' => true,
             'data' => $result,

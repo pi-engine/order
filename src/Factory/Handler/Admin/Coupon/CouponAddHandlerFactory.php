@@ -1,33 +1,33 @@
 <?php
 
-namespace Order\Factory\Handler\Admin\Discount;
+namespace Order\Factory\Handler\Admin\Coupon;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Order\Handler\Admin\Discount\DiscountListHandler;
-use Order\Service\DiscountService;
+use Order\Handler\Admin\Coupon\CouponAddHandler;
+use Order\Service\CouponService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-class DiscountListHandlerFactory implements FactoryInterface
+class CouponAddHandlerFactory implements FactoryInterface
 {
     /**
      * @param ContainerInterface $container
-     * @param string $requestedName
-     * @param null|array $options
+     * @param string             $requestedName
+     * @param null|array         $options
      *
-     * @return DiscountListHandler
+     * @return CouponAddHandler
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): DiscountListHandler
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): CouponAddHandler
     {
-        return new DiscountListHandler(
+        return new CouponAddHandler(
             $container->get(ResponseFactoryInterface::class),
             $container->get(StreamFactoryInterface::class),
-            $container->get(DiscountService::class)
+            $container->get(CouponService::class)
         );
     }
 }

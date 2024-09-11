@@ -1,6 +1,6 @@
 <?php
 
-namespace Order\Handler\Admin\Discount;
+namespace Order\Handler\Admin\Coupon;
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -8,9 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Order\Service\DiscountService;
+use Order\Service\CouponService;
 
-class DiscountGetHandler implements RequestHandlerInterface
+class CouponAddHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -18,18 +18,17 @@ class DiscountGetHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var DiscountService */
-    protected DiscountService $discountService;
+    /** @var CouponService */
+    protected CouponService $discountService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface   $streamFactory,
-        DiscountService             $discountService
-    )
-    {
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
+        StreamFactoryInterface $streamFactory,
+        CouponService $discountService
+    ) {
+        $this->responseFactory     = $responseFactory;
+        $this->streamFactory       = $streamFactory;
         $this->discountService = $discountService;
     }
 
@@ -40,12 +39,10 @@ class DiscountGetHandler implements RequestHandlerInterface
 
         // Get request body
         $requestBody = $request->getParsedBody();
-        $discount = $this->discountService->getDiscountAdmin($requestBody,$account);
-        $discount = [
-            'result' => true,
-            'data' => $discount,
-            'error' => null,
-        ];
-        return new JsonResponse($discount);
+
+        // Get list of Orders
+        $result = $this->discountService->addCoupon($requestBody,$account);
+
+        return new JsonResponse($result);
     }
 }

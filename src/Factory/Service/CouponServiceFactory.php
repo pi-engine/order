@@ -2,19 +2,16 @@
 
 namespace Order\Factory\Service;
 
-use Content\Service\ItemService;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Order\Repository\OrderRepositoryInterface;
 use Order\Service\DiscountService;
-use Order\Service\PaymentService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Order\Repository\OrderRepositoryInterface;
-use Order\Service\OrderService;
 use User\Service\AccountService;
 use User\Service\UtilityService;
 
-class DiscountServiceFactory implements FactoryInterface
+class CouponServiceFactory implements FactoryInterface
 {
     /**
      * @param ContainerInterface $container

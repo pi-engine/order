@@ -36,18 +36,13 @@ class CouponVerifyHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-
         $account = $request->getAttribute('account');
-
         $requestBody = $request->getParsedBody();
-
         $params = [
             'code' => $requestBody['code'] ?? '',
             'status' => 1,
         ];
-
         $result = $this->discountService->verifyCode($params,$account);
-
         return new JsonResponse($result);
     }
 }
