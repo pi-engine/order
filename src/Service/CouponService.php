@@ -10,7 +10,7 @@ use User\Service\AccountService;
 use User\Service\UtilityService;
 use function var_dump;
 
-class DiscountService implements ServiceInterface
+class CouponService implements ServiceInterface
 {
     /* @var OrderRepositoryInterface */
     protected OrderRepositoryInterface $orderRepository;
@@ -31,9 +31,9 @@ class DiscountService implements ServiceInterface
         $this->utilityService = $utilityService;
     }
 
-    public function getDiscount(array $params, mixed $account): array
+    public function getCoupon(array $params, mixed $account): array
     {
-        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
+        $discount = $this->canonizeCoupon($this->orderRepository->getCoupon(['code' => $params['code'], 'status' => 1]));
         if (empty($discount)) {
             return [];
         }
@@ -45,7 +45,7 @@ class DiscountService implements ServiceInterface
 
     public function verifyCode(array $params, mixed $account): array
     {
-        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount(['code' => $params['code'], 'status' => 1]));
+        $discount = $this->canonizeCoupon($this->orderRepository->getCoupon(['code' => $params['code'], 'status' => 1]));
 
         if (empty($discount)) {
             return [
@@ -84,7 +84,7 @@ class DiscountService implements ServiceInterface
 
     }
 
-    private function canonizeDiscount(object|array $discount): array
+    private function canonizeCoupon(object|array $discount): array
     {
         if (empty($discount)) {
             return [];
@@ -128,13 +128,13 @@ class DiscountService implements ServiceInterface
         return $discount;
     }
 
-    public function useDiscount(array $discountData, mixed $account): void
+    public function useCoupon(array $discountData, mixed $account): void
     {
         $discountData['count_used'] = $discountData['count_used'] + 1;
-        $this->orderRepository->updateDiscount($discountData);
+        $this->orderRepository->updateCoupon($discountData);
     }
 
-    public function getDiscountList(object|array|null $params, mixed $account): array
+    public function getCouponList(object|array|null $params, mixed $account): array
     {
         $limit = $params['limit'] ?? 1000000;
         $page = $params['page'] ?? 1;
@@ -143,12 +143,12 @@ class DiscountService implements ServiceInterface
         $params["order"] = $order;
         $params["offset"] = $offset;
         $params["limit"] = $limit;
-        $list = $this->orderRepository->getDiscountList($params);
+        $list = $this->orderRepository->getCouponList($params);
         $discountList = [];
         foreach ($list as $item) {
-            $discountList[] = $this->canonizeDiscount($item);
+            $discountList[] = $this->canonizeCoupon($item);
         }
-        $count = $this->orderRepository->getDiscountCount($params);
+        $count = $this->orderRepository->getCouponCount($params);
         return [
             'result' => true,
             'data' => [
@@ -164,18 +164,18 @@ class DiscountService implements ServiceInterface
         ];
     }
 
-    public function getDiscountAdmin(object|array|null $params, mixed $account): array
+    public function getCouponAdmin(object|array|null $params, mixed $account): array
     {
-        $discount = $this->canonizeDiscount($this->orderRepository->getDiscount($params));
+        $discount = $this->canonizeCoupon($this->orderRepository->getCoupon($params));
         if (empty($discount)) {
             return [];
         }
         return $discount;
     }
 
-    public function addDiscount(object|array|null $params, mixed $account): array
+    public function addCoupon(object|array|null $params, mixed $account): array
     {
-        $discount = $this->getDiscountAdmin(['code' => $params['code'] ?? ''], $account);
+        $discount = $this->getCouponAdmin(['code' => $params['code'] ?? ''], $account);
         if (!empty($discount)) {
             return [
                 'result' => false,
@@ -198,7 +198,7 @@ class DiscountService implements ServiceInterface
             );
         }
 
-        $result = $this->canonizeDiscount($this->orderRepository->addDiscount($params, $account));
+        $result = $this->canonizeCoupon($this->orderRepository->addCoupon($params, $account));
         return [
             'result' => true,
             'data' => $result,
@@ -206,7 +206,7 @@ class DiscountService implements ServiceInterface
         ];
     }
 
-    public function updateDiscount(array $params, mixed $account): array
+    public function updateCoupon(array $params, mixed $account): array
     {
         $listParams['time_update'] = time();
         $listParams['code'] = $params['code'] ?? '';
@@ -221,7 +221,7 @@ class DiscountService implements ServiceInterface
             $listParams['time_expired'] = strtotime(sprintf('%s', $params['time_expired']));
         }
 
-        return $this->canonizeDiscount($this->orderRepository->updateDiscount($listParams));
+        return $this->canonizeCoupon($this->orderRepository->updateCoupon($listParams));
     }
 
 

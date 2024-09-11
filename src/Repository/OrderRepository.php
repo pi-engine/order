@@ -11,7 +11,7 @@ use Laminas\Db\Sql\Predicate\Expression;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Update;
 use Laminas\Hydrator\HydratorInterface;
-use Order\Model\Discount;
+use Order\Model\Coupon;
 use Order\Model\Order;
 use Order\Model\OrderItem;
 use RuntimeException;
@@ -35,11 +35,11 @@ class OrderRepository implements OrderRepositoryInterface
     private string $tableOrderItem = 'order_item';
 
     /**
-     * Order Discount Table name
+     * Order Coupon Table name
      *
      * @var string
      */
-    private string $tableOrderDiscount = 'order_discount';
+    private string $tableOrderCoupon = 'order_coupon';
 
     /**
      * @var AdapterInterface
@@ -51,9 +51,9 @@ class OrderRepository implements OrderRepositoryInterface
      */
     private Order $orderPrototype;
     /**
-     * @var Discount
+     * @var Coupon
      */
-    private Discount $discountPrototype;
+    private Coupon $discountPrototype;
 
     /**
      * @var OrderItem
@@ -69,7 +69,7 @@ class OrderRepository implements OrderRepositoryInterface
         AdapterInterface  $db,
         HydratorInterface $hydrator,
         Order             $orderPrototype,
-        Discount          $discountPrototype,
+        Coupon          $discountPrototype,
         OrderItem         $orderItemPrototype
     )
     {
@@ -384,12 +384,12 @@ class OrderRepository implements OrderRepositoryInterface
      * @param $params
      * @return object|array
      */
-    public function getDiscount($params): object|array
+    public function getCoupon($params): object|array
     {
         $where = $params;
 
         $sql = new Sql($this->db);
-        $select = $sql->select($this->tableOrderDiscount)->where($where);
+        $select = $sql->select($this->tableOrderCoupon)->where($where);
         $statement = $sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
 
@@ -418,9 +418,9 @@ class OrderRepository implements OrderRepositoryInterface
      *
      * @return array|object
      */
-    public function updateDiscount(array $params): object|array
+    public function updateCoupon(array $params): object|array
     {
-        $update = new Update($this->tableOrderDiscount);
+        $update = new Update($this->tableOrderCoupon);
         $update->set($params);
         $update->where(['code' => $params['code']]);
 
@@ -433,7 +433,7 @@ class OrderRepository implements OrderRepositoryInterface
                 'Database error occurred during update operation'
             );
         }
-        return $this->getDiscount(['code' => $params['code']]);
+        return $this->getCoupon(['code' => $params['code']]);
     }
 
     /**
@@ -441,7 +441,7 @@ class OrderRepository implements OrderRepositoryInterface
      *
      * @return HydratingResultSet|array
      */
-    public function getDiscountList(array $params = []): HydratingResultSet|array
+    public function getCouponList(array $params = []): HydratingResultSet|array
     {
 
         $where = [];
@@ -459,7 +459,7 @@ class OrderRepository implements OrderRepositoryInterface
         }
 
         $sql = new Sql($this->db);
-        $select = $sql->select($this->tableOrderDiscount)->where($where)->order($params['order'])->offset($params['offset'])->limit($params['limit']);
+        $select = $sql->select($this->tableOrderCoupon)->where($where)->order($params['order'])->offset($params['offset'])->limit($params['limit']);
         $statement = $sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
 
@@ -473,7 +473,7 @@ class OrderRepository implements OrderRepositoryInterface
         return $resultSet;
     }
 
-    public function getDiscountCount(array $params = []): int
+    public function getCouponCount(array $params = []): int
     {
         $where = [];
         if (isset($params['status']) && !empty($params['status'])) {
@@ -491,15 +491,15 @@ class OrderRepository implements OrderRepositoryInterface
 
         $columns = ['count' => new Expression('count(*)')];
         $sql = new Sql($this->db);
-        $select = $sql->select($this->tableOrderDiscount)->columns($columns)->where($where);
+        $select = $sql->select($this->tableOrderCoupon)->columns($columns)->where($where);
         $statement = $sql->prepareStatementForSqlObject($select);
         $row = $statement->execute()->current();
         return (int)$row['count'];
     }
 
-    public function addDiscount(array $params): object|array
+    public function addCoupon(array $params): object|array
     {
-        $insert = new Insert($this->tableOrderDiscount);
+        $insert = new Insert($this->tableOrderCoupon);
         $insert->values($params);
 
         $sql = new Sql($this->db);
@@ -512,6 +512,6 @@ class OrderRepository implements OrderRepositoryInterface
             );
         }
         $id = $result->getGeneratedValue();
-        return $this->getDiscount(['id' => $id]);
+        return $this->getCoupon(['id' => $id]);
     }
 }

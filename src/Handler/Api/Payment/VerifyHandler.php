@@ -34,23 +34,12 @@ class VerifyHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get account
-//        $account = $request->getAttribute('account');
-
-        // Get request body
         $requestBody = $request->getParsedBody();
-
-        // Set record params
         $params = [
-//            'user_id' => $account['id'],
             'authority'    => $requestBody['authority'] ?? 1,
             'slug'   => $requestBody['slug'] ?? 100,
         ];
-
-        // Get list of Orders
-//        $result = $this->orderService->verifyPayment($params,$account);
         $result = $this->orderService->verifyPayment($params,[]);
-
         return new JsonResponse($result);
     }
 }

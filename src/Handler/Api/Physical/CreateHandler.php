@@ -35,18 +35,9 @@ class CreateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get account
         $account = $request->getAttribute('account');
-
-        // Get request body
         $requestBody = $request->getParsedBody();
-
-
-        // Get list of notifications
         $result = $this->orderService->createPhysicalOrder($requestBody,$account);
-
-
-
         return new JsonResponse($result);
     }
 }

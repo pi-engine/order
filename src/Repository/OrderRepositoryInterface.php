@@ -19,6 +19,6 @@ interface OrderRepositoryInterface
 
     public function getCustomerCount();
 
-    public function getDiscount($params): object|array;
+    public function getCoupon($params): object|array;
 
 }

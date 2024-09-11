@@ -19,7 +19,7 @@ class OrderService implements ServiceInterface
 
     protected AccountService $accountService;
     protected PaymentService $paymentService;
-    protected DiscountService $discountService;
+    protected CouponService $discountService;
     protected NotificationService $notificationService;
     protected UtilityService $utilityService;
     protected array $config;
@@ -32,7 +32,7 @@ class OrderService implements ServiceInterface
         ItemService              $contentItemService,
         AccountService           $accountService,
         PaymentService           $paymentService,
-        DiscountService          $discountService,
+        CouponService          $discountService,
         NotificationService      $notificationService,
         UtilityService           $utilityService,
                                  $config
@@ -180,10 +180,6 @@ class OrderService implements ServiceInterface
      */
     public function getOrder($params, $account): array
     {
-        //        if ($order && !$order['payment']) {
-        //            $order['payment'] = $this->paymentService->buildLink($order);
-        //            $this->orderRepository->updateOrder(['id' => $order['id'], 'payment' => json_encode($order['payment'])]);
-        //        }
         return $this->canonizeOrder($this->orderRepository->getOrder($params));
     }
 
@@ -272,7 +268,7 @@ class OrderService implements ServiceInterface
                 'status' => $order->getStatus(),
                 'subtotal' => $order->getSubtotal(),
                 'tax' => $order->getTax(),
-                'discount' => $order->getDiscount(),
+                'discount' => $order->getCoupon(),
                 'gift' => $order->getGift(),
                 'payment_method' => $order->getPaymentMethod(),
                 'payment' => $order->getPayment(),
@@ -304,7 +300,6 @@ class OrderService implements ServiceInterface
         $order['information'] = (!empty($order['information'])) ? json_decode($order['information'], true) : [];
         $order['payment'] = (!empty($order['payment'])) ? json_decode($order['payment'], true) : [];
         $order["time_create_view"] = $this->utilityService->date($order['time_create']);
-//        $order["total_amount_view"] = $this->utilityService->setCurrency($order['total_amount']);
         $order["total_amount_view"] = $order['total_amount'] . ' تومان';
 
         return ($order);
@@ -362,11 +357,11 @@ class OrderService implements ServiceInterface
         }
 
         if (isset($requestBody['discount_code'])) {
-            $discountData = $this->discountService->getDiscount(['code' => $requestBody['discount_code']], $account);
+            $discountData = $this->discountService->getCoupon(['code' => $requestBody['discount_code']], $account);
             if (!empty($discountData)) {
                 $discount = $discountData['value'];
                 $gift = $discountData['code'];
-                $this->discountService->useDiscount($discountData, $account);
+                $this->discountService->useCoupon($discountData, $account);
             }
         }
         $params['subtotal'] = $price;
@@ -723,10 +718,7 @@ class OrderService implements ServiceInterface
             $currentDay = strtotime('+1 day', $currentDay);
         }
 
-// Process your actual data
         foreach ($list as $item) {
-            // Convert the timestamp to a date string with the day only
-//            $day = date('Y-m-d', $item['time_create']);
             $day = explode(' ', $this->utilityService->date($item['time_create']))[0];
 
             // Increment the count and update the total_amount
@@ -734,7 +726,6 @@ class OrderService implements ServiceInterface
             $groupedData[$day]['total_amount'] += $item['total_amount'];
         }
 
-// Sort by date
         ksort($groupedData);
         return [
             'labels' => array_keys($groupedData),
@@ -743,7 +734,7 @@ class OrderService implements ServiceInterface
 
     }
 
-    public function getDate()
+    public function getDate(): array
     {
         $params['data_from'] = explode(' ', $this->utilityService->date(strtotime('-30 days')))[0];
         $params['data_to'] = explode(' ', $this->utilityService->date(time()))[0];

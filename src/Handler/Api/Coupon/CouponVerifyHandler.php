@@ -1,9 +1,9 @@
 <?php
 
-namespace Order\Handler\Api\Discount;
+namespace Order\Handler\Api\Coupon;
 
 use Laminas\Diactoros\Response\JsonResponse;
-use Order\Service\DiscountService;
+use Order\Service\CouponService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -11,7 +11,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Order\Service\OrderService;
 
-class DiscountVerifyHandler implements RequestHandlerInterface
+class CouponVerifyHandler implements RequestHandlerInterface
 {
     /** @var ResponseFactoryInterface */
     protected ResponseFactoryInterface $responseFactory;
@@ -19,14 +19,14 @@ class DiscountVerifyHandler implements RequestHandlerInterface
     /** @var StreamFactoryInterface */
     protected StreamFactoryInterface $streamFactory;
 
-    /** @var DiscountService */
-    protected DiscountService $discountService;
+    /** @var CouponService */
+    protected CouponService $discountService;
 
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        DiscountService          $discountService
+        CouponService          $discountService
     )
     {
         $this->responseFactory  = $responseFactory;

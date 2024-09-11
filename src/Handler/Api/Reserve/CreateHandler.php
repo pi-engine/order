@@ -35,13 +35,8 @@ class CreateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get account
         $account = $request->getAttribute('account');
-
-        // Get request body
         $requestBody = $request->getParsedBody();
-
-        // Set record params
         $params = [
             'user_id' => $account['id'],
             'order_type' => 'reserve',
@@ -53,10 +48,7 @@ class CreateHandler implements RequestHandlerInterface
             'item_id' => $requestBody['item_id'],
             'item_slug' => $requestBody['item_slug'],
         ];
-
-        // Get list of Orders
         $result = $this->orderService->createReserveOrder($params, $account);
-
         return new JsonResponse($result);
     }
 }

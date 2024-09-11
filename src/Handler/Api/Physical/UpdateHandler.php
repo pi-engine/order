@@ -34,22 +34,14 @@ class UpdateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Get account
         $account = $request->getAttribute('account');
-
-        // Get request body
         $requestBody = $request->getParsedBody();
-
-        // Set record params
         $params = [
             'user_id' => $account['id'],
             'page'    => $requestBody['page'] ?? 1,
             'limit'   => $requestBody['limit'] ?? 100,
         ];
-
-        // Get list of Orders
         $result = $this->orderService->getOrderList($params,$account);
-
         return new JsonResponse($result);
     }
 }
