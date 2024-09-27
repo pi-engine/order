@@ -35,6 +35,7 @@ class AddressAddHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     { 
         $account = $request->getAttribute('account');
+        $requestBody = $request->getParsedBody();
         $requestBody["user_id"] =  $account['id']; 
         $result = $this->addressService->addAddress($requestBody,$account);
         $result = [
