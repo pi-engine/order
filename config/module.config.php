@@ -244,6 +244,7 @@ return [
                                         'handler' => 'update',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
@@ -393,6 +394,7 @@ return [
                                 'handler' => 'get',
                                 'controller' => PipeSpec::class,
                                 'middleware' => new PipeSpec(
+                                    RequestPreparationMiddleware::class,
                                     SecurityMiddleware::class,
                                     AuthenticationMiddleware::class,
                                     AuthorizationMiddleware::class,
@@ -431,6 +433,7 @@ return [
                                 'handler' => 'update',
                                 'controller' => PipeSpec::class,
                                 'middleware' => new PipeSpec(
+                                    RequestPreparationMiddleware::class,
                                     SecurityMiddleware::class,
                                     AuthenticationMiddleware::class,
                                     AuthorizationMiddleware::class,
@@ -476,6 +479,7 @@ return [
                                         'handler' => 'update',
                                         'controller' => PipeSpec::class,
                                         'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
                                             SecurityMiddleware::class,
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
